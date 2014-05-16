@@ -33,5 +33,9 @@
 	<repositories>
 	</repositories>
 	<modules>
+	<module>../streams-archive-web</module>
+	<module>../streams-processor</module>
+	<module>../streams-producer</module>
+	<module>../streams-consumer</module>
 	</modules>
 </project>
