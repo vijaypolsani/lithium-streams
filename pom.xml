@@ -37,5 +37,7 @@
 	<module>../streams-processor</module>
 	<module>../streams-producer</module>
 	<module>../streams-consumer</module>
+	
+	<module>../streams-consumer-web</module>
 	</modules>
 </project>
