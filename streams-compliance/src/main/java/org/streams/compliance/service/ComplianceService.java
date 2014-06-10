@@ -13,25 +13,32 @@ import javax.ws.rs.core.MediaType;
 import org.glassfish.jersey.media.sse.EventOutput;
 import org.glassfish.jersey.media.sse.SseFeature;
 
+import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
 
-public interface ComplianceService {
+@Path("lia")
+public class ComplianceService {
 
 	@GET
-	@Path("/stream/{id}")
+	@Path("/live/{id}")
 	//@Produces(MediaType.APPLICATION_JSON)
 	@Produces(SseFeature.SERVER_SENT_EVENTS)
 	@Timed
 	@Metered
-	public abstract EventOutput getLiaEvents(@PathParam("id") String login) throws InterruptedException,
-			ExecutionException;
+	@ExceptionMetered
+	public EventOutput getLiveEvents(@PathParam("id") String login) throws InterruptedException, ExecutionException {
+		return null;
+	}
 
 	@GET
-	@Path("/batch/{id}")
+	@Path("/bulk/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Timed
 	@Metered
-	public abstract EventOutput getLiaActivityStreams(@PathParam("id") String login,
-			@DefaultValue("1.0") @QueryParam("version") float version) throws InterruptedException, ExecutionException;
+	@ExceptionMetered
+	public String getBatchEvents(@PathParam("id") String login,
+			@DefaultValue("1.0") @QueryParam("version") float version) throws InterruptedException, ExecutionException {
+		return "TEST";
+	}
 }

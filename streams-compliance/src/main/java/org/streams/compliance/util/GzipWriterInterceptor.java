@@ -1,4 +1,4 @@
-package org.streams.compliance.service;
+package org.streams.compliance.util;
 
 import java.io.IOException;
 import java.io.OutputStream;

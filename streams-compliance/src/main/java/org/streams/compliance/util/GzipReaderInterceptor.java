@@ -1,4 +1,4 @@
-package org.streams.compliance.service;
+package org.streams.compliance.util;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -8,7 +8,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 
-public class GzipRederInterceptor implements WriterInterceptor {
+public class GzipReaderInterceptor implements WriterInterceptor {
 
 	@Override
 	public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
