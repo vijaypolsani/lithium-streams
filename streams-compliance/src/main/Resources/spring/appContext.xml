@@ -6,4 +6,18 @@
 
 	<context:property-placeholder location="classpath:/spring/config.properties" />
 
+	<context:annotation-config />
+	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
+
+	<!-- Definition for Spring Service bean -->
+	<bean id="transformationService" class="com.lithium.activitystreams.bean.impl.TransformationServiceImpl" autowire="constructor"
+		autowire-candidate="true">
+	</bean>
+	<bean id="filteringService" class="com.lithium.activitystreams.bean.impl.FilteringServiceImpl" autowire="constructor"
+		autowire-candidate="true">
+	</bean>
+	<bean id="consumeEventsService" class="com.lithium.activitystreams.bean.impl.ConsumeEventsServiceImpl" autowire="constructor"
+		autowire-candidate="true">
+	</bean>
+	
 </beans>

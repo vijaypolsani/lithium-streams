@@ -40,5 +40,6 @@
 	<module>../streams-consumer-web</module>
     <module>streams-compliance</module>
     <module>streams-topologies</module>
+    <module>streams-client</module>
   </modules>
 </project>
