@@ -1,4 +1,4 @@
-package com.lithium.streams.compliance.client;
+package com.lithium.streams.compliance;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

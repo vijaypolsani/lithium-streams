@@ -8,11 +8,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static com.google.common.base.Preconditions.*;
+
 import com.lithium.streams.compliance.consumer.ConsumerGroup;
 
 public class ConsumeEventsServiceImpl implements ConsumeEventsService {
 	private static final String ZK_HOSTNAME_URL = "10.240.163.94:2181";
-	private static final String GROUP_ID = "LiaConsumer";
 	private static final String ZK_TIMEOUT = "5000";
 
 	@Autowired
@@ -24,28 +25,15 @@ public class ConsumeEventsServiceImpl implements ConsumeEventsService {
 	}
 
 	@Override
-	public List<String> consumeLiaActivitySteamsEvents(String communityName, String login) {
+	public List<String> consumeEvents(String communityName, String login) {
+		checkNotNull(communityName, "Community Name parameter cannot be NULL.");
+		checkNotNull(login, "Login User Name parameter cannot be NULL.");
 		ConsumeMessages consumeMessages = null;
 		// Make sure to take a Login ID for Attaching a ConsumerGroup in Future.
-		if (login == null)
-			login = GROUP_ID;
+		String groupId = communityName + login;
 		try {
-			consumeMessages = new ConsumeMessages("Lia_RAW_ConsumeThread", ZK_HOSTNAME_URL, GROUP_ID, ZK_TIMEOUT);
-			consumeMessages.start();
-		} catch (InterruptedException | ExecutionException e1) {
-			e1.printStackTrace();
-		}
-		return consumeMessages.getData();
-	}
-
-	@Override
-	public List<String> consumeLiaActivitySteamsEvents(String communityName, String login, String user) {
-		ConsumeMessages consumeMessages = null;
-		// Make sure to take a Login ID for Attaching a ConsumerGroup in Future.
-		if (login == null)
-			login = GROUP_ID;
-		try {
-			consumeMessages = new ConsumeMessages("Lia_AS1.0_ConsumeThread", ZK_HOSTNAME_URL, GROUP_ID, ZK_TIMEOUT);
+			consumeMessages = new ConsumeMessages("ComplianceConsumerThread", ZK_HOSTNAME_URL, ZK_TIMEOUT,
+					communityName, groupId);
 			consumeMessages.start();
 		} catch (InterruptedException | ExecutionException e1) {
 			e1.printStackTrace();
@@ -63,10 +51,10 @@ class ConsumeMessages extends Thread {
 		return data;
 	}
 
-	public ConsumeMessages(String threadName, String hostNameUrl, String groupId, final String zkTimeout)
-			throws InterruptedException, ExecutionException {
+	public ConsumeMessages(String threadName, String hostNameUrl, final String zkTimeout, String topicName,
+			String groupId) throws InterruptedException, ExecutionException {
 		super(threadName);
-		consumerGroup = new ConsumerGroup(hostNameUrl, groupId, zkTimeout);
+		consumerGroup = new ConsumerGroup(hostNameUrl, zkTimeout, topicName, groupId);
 	}
 
 	public void run() {

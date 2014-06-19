@@ -23,16 +23,17 @@ public class ConsumerGroup {
 	private ConsumerCallable consumerCallable;
 	private Event lock;
 	private final String hostNameUrl;
-	private static final String topic = "lia";
+	private final String topicName;
 	private final String groupId;
 	private final String zkTimeout;
 	private static final Logger log = LoggerFactory.getLogger(ConsumerGroup.class);
 
-	public ConsumerGroup(String hostNameUrl, String groupId, String zkTimeout) throws InterruptedException,
-			ExecutionException {
+	public ConsumerGroup(String hostNameUrl, String zkTimeout, String topicName, String groupId)
+			throws InterruptedException, ExecutionException {
 		this.hostNameUrl = hostNameUrl;
-		this.groupId = groupId;
 		this.zkTimeout = zkTimeout;
+		this.topicName = topicName;
+		this.groupId = groupId;
 		consumer = kafka.consumer.Consumer.createJavaConsumerConnector(createConsumerConfig());
 		createThreadPool();
 	}
@@ -43,23 +44,23 @@ public class ConsumerGroup {
 
 	private ConsumerConfig createConsumerConfig() {
 		Properties props = new Properties();
-		//AWS Configuration.
-		props.put("zookeeper.connect", hostNameUrl);
 		// Localhost Configuration
 		//props.put("zookeeper.connect", "localhost:2181");
-		props.put("group.id", groupId);
+		//AWS Configuration.
+		props.put("zookeeper.connect", hostNameUrl);
 		props.put("zookeeper.session.timeout.ms", zkTimeout);
 		props.put("zookeeper.sync.time.ms", "200");
 		props.put("auto.commit.interval.ms", "500");
+		props.put("group.id", groupId);
 		return new ConsumerConfig(props);
 	}
 
 	public void createThreadPool() throws InterruptedException, ExecutionException {
 		Future<List<String>> tasks = null;
 		Map<String, Integer> topicCountMap = new HashMap<String, Integer>();
-		topicCountMap.put(topic, new Integer(numberOfThreads));
+		topicCountMap.put(topicName, new Integer(numberOfThreads));
 		Map<String, List<KafkaStream<byte[], byte[]>>> consumerStreams = consumer.createMessageStreams(topicCountMap);
-		List<KafkaStream<byte[], byte[]>> streams = consumerStreams.get(topic);
+		List<KafkaStream<byte[], byte[]>> streams = consumerStreams.get(topicName);
 		// now create an object to consume the messages
 		int threadNumber = 1;
 		for (KafkaStream<byte[], byte[]> stream : streams) {
@@ -83,7 +84,7 @@ public class ConsumerGroup {
 	public static void main(String[] args) {
 
 		try {
-			ConsumerGroup consumerGroup = new ConsumerGroup("10.240.163.94:2181", "LiaConsumer", "5000");
+			ConsumerGroup consumerGroup = new ConsumerGroup("10.240.163.94:2181", "LiaConsumer", "5000", "lia");
 			while (true) {
 				synchronized (consumerGroup.lock) {
 					log.info(">>> In ConsumerGroup: " + consumerGroup.lock.getJsonContent());

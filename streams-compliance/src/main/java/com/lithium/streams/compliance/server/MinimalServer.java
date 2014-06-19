@@ -28,10 +28,6 @@ import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.health.HealthCheckRegistry;
 import com.codahale.metrics.servlets.AdminServlet;
-import com.codahale.metrics.servlets.HealthCheckServlet;
-import com.codahale.metrics.servlets.MetricsServlet;
-import com.codahale.metrics.servlets.PingServlet;
-import com.codahale.metrics.servlets.ThreadDumpServlet;
 import com.lithium.streams.compliance.service.ComplianceService;
 import com.lithium.streams.compliance.util.DumpServlet;
 
@@ -43,7 +39,6 @@ public class MinimalServer {
 	private static final ExecutorService threadPoolExecutors = Executors.newCachedThreadPool();
 	private static final ServletHolder rsServletHolder = new ServletHolder(ServletContainer.class);
 	private static final ResourceConfig resourceConfig = new ResourceConfig();
-	private static String keystoreLocation = null;
 
 	public MinimalServer() {
 		final JmxReporter reporter = JmxReporter.forRegistry(registry).build();
@@ -52,7 +47,8 @@ public class MinimalServer {
 	}
 
 	public static void main(String args[]) throws Exception {
-		rsServletHolder.setInitParameter("jersey.config.server.provider.packages", "org.streams.compliance.service");//Set the package where the services reside
+		//Set the package where the services reside
+		rsServletHolder.setInitParameter("jersey.config.server.provider.packages", "org.streams.compliance.service");
 		resourceConfig.packages(ComplianceService.class.getPackage().getName());
 		resourceConfig.register(JacksonFeature.class);
 		ServletContainer servletContainer = new ServletContainer(resourceConfig);
@@ -93,7 +89,7 @@ public class MinimalServer {
 
 		HttpConfiguration http_config = new HttpConfiguration();
 		http_config.setSecureScheme("https");
-		http_config.setSecurePort(8443);
+		http_config.setSecurePort(7443);
 		http_config.setOutputBufferSize(32768);
 
 		Connector[] connectors = new Connector[2];
@@ -112,7 +108,7 @@ public class MinimalServer {
 
 	private static ServerConnector setHttpConfiguration(Server server, HttpConfiguration http_config) {
 		ServerConnector serverConnector = new ServerConnector(server, new HttpConnectionFactory(http_config));
-		serverConnector.setPort(8080);
+		serverConnector.setPort(6060);
 		serverConnector.setIdleTimeout(108000);
 		return serverConnector;
 	}
@@ -128,7 +124,7 @@ public class MinimalServer {
 		https_config.addCustomizer(new SecureRequestCustomizer());
 		ServerConnector serverConnector = new ServerConnector(server, new SslConnectionFactory(sslContextFactory,
 				"http/1.1"), new HttpConnectionFactory(https_config));
-		serverConnector.setPort(8443);
+		serverConnector.setPort(6443);
 		serverConnector.setIdleTimeout(108000);
 		return serverConnector;
 	}

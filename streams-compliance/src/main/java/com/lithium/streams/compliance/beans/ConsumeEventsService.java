@@ -4,8 +4,6 @@ import java.util.List;
 
 public interface ConsumeEventsService {
 
-	public abstract List<String> consumeLiaActivitySteamsEvents(String communityName, String login);
-
-	public abstract List<String> consumeLiaActivitySteamsEvents(String communityName, String login, String user);
+	public abstract List<String> consumeEvents(String communityName, String login);
 
 }

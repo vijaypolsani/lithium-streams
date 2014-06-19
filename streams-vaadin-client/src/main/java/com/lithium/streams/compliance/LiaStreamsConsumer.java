@@ -1,4 +1,4 @@
-package com.lithium.streams.compliance.client;
+package com.lithium.streams.compliance;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -13,8 +13,7 @@ import org.slf4j.LoggerFactory;
 
 public class LiaStreamsConsumer {
 
-	public static final String RAW_URL = "http://localhost:8080/streams-archive-web/lia/raw/sathi.qa";
-	public static final String STREAMS_URL = "http://localhost:8080/streams-archive-web/lia/streams/sathi.qa";
+	private static final String STREAMS_URL = "http://localhost:6060/compliance/live/actiance.qa?login=vijay";
 
 	private static final Logger log = LoggerFactory.getLogger(LiaStreamsConsumer.class);
 
