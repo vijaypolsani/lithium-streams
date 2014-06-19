@@ -24,7 +24,7 @@ public class ConsumeEventsServiceImpl implements ConsumeEventsService {
 	}
 
 	@Override
-	public List<String> consumeAllRawEvents(String login) {
+	public List<String> consumeLiaActivitySteamsEvents(String communityName, String login) {
 		ConsumeMessages consumeMessages = null;
 		// Make sure to take a Login ID for Attaching a ConsumerGroup in Future.
 		if (login == null)
@@ -39,7 +39,7 @@ public class ConsumeEventsServiceImpl implements ConsumeEventsService {
 	}
 
 	@Override
-	public List<String> consumeAllActivitySteamsEvents(String login) {
+	public List<String> consumeLiaActivitySteamsEvents(String communityName, String login, String user) {
 		ConsumeMessages consumeMessages = null;
 		// Make sure to take a Login ID for Attaching a ConsumerGroup in Future.
 		if (login == null)
@@ -52,7 +52,6 @@ public class ConsumeEventsServiceImpl implements ConsumeEventsService {
 		}
 		return consumeMessages.getData();
 	}
-
 }
 
 class ConsumeMessages extends Thread {

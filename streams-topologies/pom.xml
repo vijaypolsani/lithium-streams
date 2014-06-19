@@ -7,9 +7,7 @@
 		<artifactId>lithium-streams</artifactId>
 		<version>0.0.1</version>
 	</parent>
-	<groupId>com.lithium.integrations</groupId>
 	<artifactId>streams-topologies</artifactId>
-	<version>0.0.1</version>
 	<name>streams-topologies</name>
 	<url>http://stash.dev.lithium.com/projects/INTF/streams-topologies</url>
 	<properties>
@@ -24,9 +22,39 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.kafka</groupId>
+			<artifactId>kafka_2.10</artifactId>
+			<version>0.8.1.1</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>jmxtools</artifactId>
+					<groupId>com.sun.jdmk</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jmxri</artifactId>
+					<groupId>com.sun.jmx</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
 			<groupId>com.googlecode.json-simple</groupId>
 			<artifactId>json-simple</artifactId>
 			<version>1.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.3.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>2.3.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.3.3</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -41,8 +69,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>1.7</source>
+					<target>1.7</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -53,7 +81,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass></mainClass>
+							<mainClass>com.lithium.streams.compliance.topology.ComplianceTopology</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

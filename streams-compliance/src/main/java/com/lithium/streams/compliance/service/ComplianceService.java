@@ -17,7 +17,7 @@ import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
 
-@Path("lia")
+@Path("v1")
 public class ComplianceService {
 
 	@GET

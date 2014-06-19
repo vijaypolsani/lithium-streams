@@ -10,13 +10,13 @@
 	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
 
 	<!-- Definition for Spring Service bean -->
-	<bean id="transformationService" class="com.lithium.activitystreams.bean.impl.TransformationServiceImpl" autowire="constructor"
+	<bean id="transformationService" class="com.lithium.streams.compliance.beans.TransformationServiceImpl" autowire="constructor"
 		autowire-candidate="true">
 	</bean>
-	<bean id="filteringService" class="com.lithium.activitystreams.bean.impl.FilteringServiceImpl" autowire="constructor"
+	<bean id="filteringService" class="com.lithium.streams.compliance.beans.FilteringServiceImpl" autowire="constructor"
 		autowire-candidate="true">
 	</bean>
-	<bean id="consumeEventsService" class="com.lithium.activitystreams.bean.impl.ConsumeEventsServiceImpl" autowire="constructor"
+	<bean id="consumeEventsService" class="com.lithium.streams.compliance.beans.ConsumeEventsServiceImpl" autowire="constructor"
 		autowire-candidate="true">
 	</bean>
 	

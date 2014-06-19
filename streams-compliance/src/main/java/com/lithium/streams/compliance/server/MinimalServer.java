@@ -43,6 +43,7 @@ public class MinimalServer {
 	private static final ExecutorService threadPoolExecutors = Executors.newCachedThreadPool();
 	private static final ServletHolder rsServletHolder = new ServletHolder(ServletContainer.class);
 	private static final ResourceConfig resourceConfig = new ResourceConfig();
+	private static String keystoreLocation = null;
 
 	public MinimalServer() {
 		final JmxReporter reporter = JmxReporter.forRegistry(registry).build();
@@ -62,7 +63,7 @@ public class MinimalServer {
 		context.setContextPath("/");
 
 		// Add REST Servlet
-		context.addServlet(sh, "/v1/*");
+		context.addServlet(sh, "/compliance/*");
 
 		//CodeHale param
 		context.setAttribute("com.codahale.metrics.servlets.MetricsServlet.registry", registry);
@@ -71,14 +72,14 @@ public class MinimalServer {
 		context.setAttribute("com.codahale.metrics.servlets.HealthCheckServlet.executor", threadPoolExecutors);
 
 		// Add servlets
-		context.addServlet(new ServletHolder(new ComplianceStreamingServlet()), "/stream/*");
-		context.addServlet(new ServletHolder(new ComplainceBatchServlet()), "/batch/*");
-		context.addServlet(new ServletHolder(new DumpServlet()), "/dump/*");
-		context.addServlet(new ServletHolder(new MetricsServlet()), "/metrics/*");
 		context.addServlet(new ServletHolder(new AdminServlet()), "/admin/*");
-		context.addServlet(new ServletHolder(new HealthCheckServlet()), "/health/*");
-		context.addServlet(new ServletHolder(new PingServlet()), "/ping/*");
-		context.addServlet(new ServletHolder(new ThreadDumpServlet()), "/tdump/*");
+		context.addServlet(new ServletHolder(new DumpServlet()), "/dump/*");
+		context.addServlet(new ServletHolder(new ComplianceStreamingServlet()), "/real/*");
+		context.addServlet(new ServletHolder(new ComplainceBatchServlet()), "/batch/*");
+		//context.addServlet(new ServletHolder(new MetricsServlet()), "/metrics/*");
+		//context.addServlet(new ServletHolder(new HealthCheckServlet()), "/health/*");
+		//context.addServlet(new ServletHolder(new PingServlet()), "/ping/*");
+		//context.addServlet(new ServletHolder(new ThreadDumpServlet()), "/tdump/*");
 
 		// Setup Spring context
 		context.addEventListener(new ContextLoaderListener());
