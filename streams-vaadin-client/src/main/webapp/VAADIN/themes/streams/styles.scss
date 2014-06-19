@@ -1,0 +1,11 @@
+@import "addons.scss";
+@import "streams.scss";
+
+/* This file prefixes all rules with the theme name to avoid causing conflicts with other themes. */
+/* The actual styles should be defined in streams.scss */
+.streams {
+  @include addons;
+
+  // Include streams theme styles in your theme
+  @include streams;
+}

@@ -116,6 +116,4 @@
 			<url>http://twitter4j.org/maven2</url>
 		</repository>
 	</repositories>
-	<groupId>com.lithium.integrations</groupId>
-	<version>0.0.1</version>
 </project>
