@@ -1,7 +1,5 @@
 package com.lithium.streams.compliance.consumer;
 
-import java.util.Deque;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
@@ -9,33 +7,31 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.lithium.streams.compliance.beans.ConsumeEventsService;
 import com.lithium.streams.compliance.beans.ConsumeEventsServiceImpl;
 import com.lithium.streams.compliance.beans.StreamEventBus;
 import com.lithium.streams.compliance.model.LiaPostEvent;
-import com.lithium.streams.compliance.util.StreamEventBusHelper;
+import com.lithium.streams.compliance.util.StreamEventBusListener;
 
 public class ConsumeMessages extends Thread {
 	private ConsumerGroup consumerGroup;
 	private final Logger log = LoggerFactory.getLogger(ConsumeEventsServiceImpl.class);
-	protected Deque<String> data = new ConcurrentLinkedDeque<String>();
 	private final StreamEventBus streamEventBus;
 	private final ApplicationContext appContext = new ClassPathXmlApplicationContext(
 			"classpath*:/spring/appContext.xml");
+	private final StreamEventBusListener streamEventBusListener;
 
 	public ConsumeMessages(String threadName, String hostNameUrl, final String zkTimeout, String topicName,
-			String groupId) throws InterruptedException, ExecutionException {
+			String groupId, StreamEventBusListener streamEventBusListener) throws InterruptedException,
+			ExecutionException {
 		super(threadName);
 		consumerGroup = new ConsumerGroup(hostNameUrl, zkTimeout, topicName, groupId);
+		this.streamEventBusListener = streamEventBusListener;
 		// Log for Spring Beans.
 		streamEventBus = (StreamEventBus) appContext.getBean("streamEventBus");
 		log.info(">>> streamEventBus : " + streamEventBus.toString());
-		streamEventBus.registerSubscriber(new StreamEventBusHelper());
+		//StreamEventBusHelper streamEventBusHelper = new StreamEventBusHelper();
+		streamEventBus.registerSubscriber(streamEventBusListener);
 
-	}
-
-	public Deque<String> getData() {
-		return data;
 	}
 
 	public void run() {
@@ -46,9 +42,10 @@ public class ConsumeMessages extends Thread {
 				//TODO: Hide the low level Thread Sync details after Performance. Remove STR and get Direct JSON Content
 				synchronized (consumerGroup.getLock()) {
 					String str = consumerGroup.getLock().getJsonContent();
-					log.info(">>> In ConsumeMessages Thread. Reading content : " + str);
+					log.debug(">>> In ConsumeMessages Thread. Reading content : " + str);
 					if (str != null) {
-						data.add(str);
+						log.info(">>> Inside ConsumeMessages sleeping for 1sec.");
+						Thread.sleep(1000);
 						streamEventBus.postEvent(new LiaPostEvent(str));
 					}
 					consumerGroup.getLock().wait();

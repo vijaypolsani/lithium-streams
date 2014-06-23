@@ -7,7 +7,7 @@ import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import com.lithium.streams.compliance.model.ComplianceEvent;
 
-public class StreamEventBusHelper {
+public class StreamEventBusHelper implements StreamEventBusListener {
 	private static final Logger log = LoggerFactory.getLogger(StreamEventBusHelper.class);
 
 	public StreamEventBusHelper() {

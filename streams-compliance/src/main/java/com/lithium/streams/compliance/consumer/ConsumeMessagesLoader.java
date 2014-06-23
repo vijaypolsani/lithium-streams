@@ -11,8 +11,9 @@ public class ConsumeMessagesLoader extends CacheLoader<String, ConsumeMessages> 
 		super();
 	}
 
+	//TODO: The NULL loader will not WORK. Need a new instance of the Service.
 	@Override
 	public ConsumeMessages load(String key) throws Exception {
-		return new ConsumeMessages(key, ZK_HOSTNAME_URL, ZK_TIMEOUT, TOPIC_NAME, key);
+		return new ConsumeMessages(key, ZK_HOSTNAME_URL, ZK_TIMEOUT, TOPIC_NAME, key, null);
 	}
 }

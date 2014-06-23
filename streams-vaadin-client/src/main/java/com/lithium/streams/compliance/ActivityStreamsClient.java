@@ -3,7 +3,6 @@ package com.lithium.streams.compliance;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayDeque;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Deque;
@@ -19,8 +18,6 @@ import org.glassfish.jersey.media.sse.SseFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.lithium.streams.compliance.model.ActivityStreams;
-import com.lithium.streams.compliance.ui.LoginForm;
 import com.lithium.streams.compliance.util.FormatData;
 import com.lithium.streams.compliance.util.JsonMessageParser;
 import com.vaadin.annotations.Theme;
@@ -29,13 +26,9 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.shared.communication.PushMode;
 import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.PasswordField;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
 
 @Theme("streams")
 @SuppressWarnings("serial")
@@ -47,6 +40,7 @@ public class ActivityStreamsClient extends UI {
 	private Label timeLabel = new Label("Loading UI, please wait...");
 	private Label eventData = new Label("Loading Event Data, Checking Server...");
 	private HorizontalLayout layout;
+
 	protected Deque<String> queue = new ConcurrentLinkedDeque<String>();
 	private javax.ws.rs.client.WebTarget webTarget;
 
@@ -57,6 +51,7 @@ public class ActivityStreamsClient extends UI {
 
 	@Override
 	protected void init(VaadinRequest request) {
+
 		//UI Layout
 		layout = new HorizontalLayout();
 		layout.setMargin(true);
@@ -107,13 +102,16 @@ public class ActivityStreamsClient extends UI {
 				log.info(">>> Iteration of the page Regresh: " + j++ + " Time: " + getCurrentTime());
 				if (queue.peek() != null) {
 					String data = queue.pop();
+					//Label title = new Label("Lithium Compliance Service");
 					try {
 						layout = FormatData.processData(layout, JsonMessageParser
 								.parseIncomingsJsonStreamToObject(data));
+						layout.setCaption("Lithium Compliance Service Real Time Events");
+						layout.setMargin(true);
+						layout.setSpacing(true);
 						layout.addComponent(new Label(data));
-						layout.addComponent(new Label(getCurrentTime()));
-						layout.setDefaultComponentAlignment(Alignment.BOTTOM_CENTER);
-
+						//layout.addComponent(new Label(getCurrentTime()));
+						layout.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -154,4 +152,5 @@ public class ActivityStreamsClient extends UI {
 			}
 		}
 	}
+
 }

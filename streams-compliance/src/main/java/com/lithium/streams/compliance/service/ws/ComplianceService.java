@@ -3,7 +3,8 @@ package com.lithium.streams.compliance.service.ws;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
-import java.util.Deque;
+import java.util.ArrayDeque;
+import java.util.Queue;
 import java.util.concurrent.ExecutionException;
 
 import javax.ws.rs.DefaultValue;
@@ -27,8 +28,12 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.Subscribe;
 import com.lithium.streams.compliance.beans.ConsumeEventsService;
 import com.lithium.streams.compliance.exception.ComplianceServiceException;
+import com.lithium.streams.compliance.model.ComplianceEvent;
+import com.lithium.streams.compliance.util.StreamEventBusListener;
 
 @Path("/")
 public class ComplianceService {
@@ -37,10 +42,11 @@ public class ComplianceService {
 	private static final Logger log = LoggerFactory.getLogger(ComplianceService.class);
 	private static ApplicationContext appContext = new ClassPathXmlApplicationContext(
 			"classpath*:/spring/appContext.xml");
-
+	//private Deque<ComplianceEvent> subscriberData = new ConcurrentLinkedDeque<ComplianceEvent>();
+	private Queue<ComplianceEvent> subscriberData = new ArrayDeque<ComplianceEvent>();
 	//@Autowired
 	private ConsumeEventsService consumeEventsService = (ConsumeEventsService) appContext
-			.getBean("consumeEventsService");;
+			.getBean("consumeEventsService");
 
 	/**
 	 * API for REAL TIME consumption of the events based on a given Community & User login.
@@ -80,34 +86,50 @@ public class ComplianceService {
 				+ Thread.currentThread().getName());
 
 		// Log for Spring Beans.
-		log.info(">>> consumeEventsService Stats: " + consumeEventsService.toString());
+		log.info(">>> consumeEventsService : " + consumeEventsService.toString());
 
-		Deque<String> data = consumeEventsService.consumeEvents(communityName, login);
-		//TODO: Subscribe to event BUS for a given TOPIC. The below may not WORK!
-		while (data.peek() != null) {
-			eventBuilder.data(String.class, data.pop());
-			final OutboundEvent event = eventBuilder.build();
-			try {
-				eventOutput.write(event);
-			} catch (IOException e) {
-				e.printStackTrace();
-				log.error("Exception in writing to SSE object eventOutput." + e.getLocalizedMessage());
-				throw new ComplianceServiceException("LI001", "Exception in writing to SSE object eventOutput.", e);
+		class StreamEventBusListenerImpl implements StreamEventBusListener {
+			@Subscribe
+			@AllowConcurrentEvents
+			public void readEvents(ComplianceEvent complianceEvent) {
+				log.info(">>> LiaPostEvent Subscribed inner class StreamEventBusListenerImpl: "
+						+ complianceEvent.getEvent());
+				eventBuilder.data(String.class, complianceEvent.getEvent());
+				final OutboundEvent event = eventBuilder.build();
+				try {
+					log.info(">>> Inside ConsumerService sending to GUI.");
+					eventOutput.write(event);
+				} catch (IOException e) {
+					e.printStackTrace();
+					log.error("Exception in writing to SSE object eventOutput." + e.getLocalizedMessage());
+					throw new ComplianceServiceException("LI001", "Exception in writing to SSE object eventOutput.", e);
+				}
 			}
+
 		}
+		consumeEventsService.consumeEvents(communityName, login, new StreamEventBusListenerImpl());
 		return eventOutput;
 	}
 
+	@Subscribe
+	@AllowConcurrentEvents
+	public void readEvent(ComplianceEvent complianceEvent) {
+		//log.info(">>> LiaPostEvent Subscribed in this ***: " + complianceEvent.getEvent());
+		log.info(">>> LiaPostEvent inside Subscriber: " + complianceEvent.getEvent());
+		log.info(">>> LiaPostEvent subscriberData Size: " + subscriberData.size());
+		subscriberData.add(complianceEvent);
+	}
+
 	/**
-	 * API to get the Batch of Events based on the StartTimestamp and EndTimestamp
-	 * @param communityName
-	 * @param login
-	 * @param startTime
-	 * @param endTime
-	 * @return String Compressed ZIP containing a batch of the events to download by the consumer.
-	 * @throws InterruptedException
-	 * @throws ExecutionException
-	 */
+	* API to get the Batch of Events based on the StartTimestamp and EndTimestamp
+	* @param communityName
+	* @param login
+	* @param startTime
+	* @param endTime
+	* @return String Compressed ZIP containing a batch of the events to download by the consumer.
+	* @throws InterruptedException
+	* @throws ExecutionException
+	*/
 
 	@GET
 	@Path("bulk/time/{communityName}")

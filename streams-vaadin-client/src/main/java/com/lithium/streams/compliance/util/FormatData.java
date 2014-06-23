@@ -1,5 +1,8 @@
 package com.lithium.streams.compliance.util;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import com.lithium.streams.compliance.model.ActivityStreams;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Table;
@@ -10,7 +13,8 @@ public class FormatData {
 
 	public static HorizontalLayout processData(HorizontalLayout layout, ActivityStreams activityStreams) {
 		layout.removeAllComponents();
-		final Table table = new Table();
+		final Table table = new Table("Lithium Activity Streams. Last Update Time: " + getCurrentTime());
+		table.setStyleName("title");
 		table.removeAllItems();
 		table.addContainerProperty("Activity Streams Property", String.class, null);
 		table.addContainerProperty("Streaming Event Value", String.class, null);
@@ -74,5 +78,10 @@ public class FormatData {
 		table.setPageLength(table.size());
 		layout.addComponent(table);
 		return layout;
+	}
+
+	private static String getCurrentTime() {
+		Date date = Calendar.getInstance().getTime();
+		return date.toString();
 	}
 }
