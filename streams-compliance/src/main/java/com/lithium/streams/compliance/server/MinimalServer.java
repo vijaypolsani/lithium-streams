@@ -4,6 +4,7 @@ import java.lang.management.ManagementFactory;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.log4j.PropertyConfigurator;
 import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.ConnectorStatistics;
@@ -22,14 +23,18 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.web.context.ContextLoaderListener;
 
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.health.HealthCheckRegistry;
 import com.codahale.metrics.servlets.AdminServlet;
-import com.lithium.streams.compliance.service.ComplianceService;
+import com.lithium.streams.compliance.beans.StreamCache;
+import com.lithium.streams.compliance.service.ws.ComplianceService;
 import com.lithium.streams.compliance.util.DumpServlet;
+import com.lithium.streams.compliance.util.ListOfSpringBeans;
 
 public class MinimalServer {
 
@@ -47,6 +52,7 @@ public class MinimalServer {
 	}
 
 	public static void main(String args[]) throws Exception {
+
 		//Set the package where the services reside
 		rsServletHolder.setInitParameter("jersey.config.server.provider.packages", "org.streams.compliance.service");
 		resourceConfig.packages(ComplianceService.class.getPackage().getName());
@@ -80,7 +86,15 @@ public class MinimalServer {
 		// Setup Spring context
 		context.addEventListener(new ContextLoaderListener());
 		context.setInitParameter("contextConfigLocation", "classpath*:/spring/appContext.xml");
-		log.info("Spring Context: " + context.getDisplayName());
+
+		// Log for Spring Beans.
+		ApplicationContext appContext = new ClassPathXmlApplicationContext("classpath*:/spring/appContext.xml");
+		StreamCache streamCache = (StreamCache) appContext.getBean("streamCache");
+		System.out.println(">>> SpringCache Stats: " + streamCache.getCache().stats());
+		System.out.println(">>> List of Spring Instantiated Beans: " + ListOfSpringBeans.getInstantiatedSigletons(appContext));
+
+		PropertyConfigurator
+				.configure("/Users/vijay.polsani/_eclipseworkspace/lithium-streams/streams-compliance/src/main/Resources/conf/log4j.properties");
 
 		Server server = new Server(threadPool);
 		//Server server = new Server();

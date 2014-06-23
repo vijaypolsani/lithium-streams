@@ -1,4 +1,4 @@
-package com.lithium.streams.compliance;
+package com.lithium.streams.compliance.util;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 public class LiaStreamsConsumer {
 
-	private static final String STREAMS_URL = "http://localhost:6060/compliance/live/actiance.qa?login=vijay";
+	private static final String STREAMS_URL = "http://localhost:6060/compliance/live/actiance.qa?login=vijay1";
 
 	private static final Logger log = LoggerFactory.getLogger(LiaStreamsConsumer.class);
 
@@ -22,8 +22,7 @@ public class LiaStreamsConsumer {
 		WebTarget target = client.target(STREAMS_URL);
 		log.info(">>> Prepared Target: " + target.getUri());
 		final EventSource eventSource = new EventSource(target);
-		log.info(">>> Registered Endpoint Reconnect Interval s: " + eventSource.RECONNECT_DEFAULT);
-		log.info(">>> Registered Endpoint & Open. Waiting");
+		log.info(">>> Registered Endpoint & Open. Waiting..");
 		eventSource.register(new KeepListening());
 	}
 

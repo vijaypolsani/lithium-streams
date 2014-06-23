@@ -13,14 +13,15 @@ public class ComplianceServiceException extends RuntimeException {
 		// TODO Auto-generated constructor stub
 	}
 
-	public ComplianceServiceException(Throwable cause) {
-		super(cause);
-		// TODO Auto-generated constructor stub
-	}
-
 	public ComplianceServiceException(String message, Throwable cause) {
 		super(message, cause);
 		// TODO Auto-generated constructor stub
+	}
+
+	public ComplianceServiceException(String errorCode, String message, Throwable cause) {
+		super(message, cause);
+		this.message = message;
+		this.errorCode = errorCode;
 	}
 
 	public ComplianceServiceException(String message, Throwable cause, boolean enableSuppression,

@@ -3,13 +3,25 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd http://www.springframework.org/schema/context
 		http://www.springframework.org/schema/context/spring-context-3.2.xsd">
-
 	<context:property-placeholder location="classpath:/spring/config.properties" />
 
 	<context:annotation-config />
+	<context:component-scan base-package="com.lithium.streams.compliance.service" />
+
 	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
 
-	<!-- Definition for Spring Service bean -->
+	<!-- Definition for Comliance App Spring Service beans -->
+
+	<bean id="streamCache" class="com.lithium.streams.compliance.beans.StreamCache" autowire="constructor"
+		autowire-candidate="true">
+	</bean>
+	<bean id="streamEventBus" class="com.lithium.streams.compliance.beans.StreamEventBus" autowire="constructor"
+		autowire-candidate="true">
+	</bean>
+	<bean id="consumerGroupRemovalListener" class="com.lithium.streams.compliance.consumer.ConsumerGroupRemovalListener"
+		autowire="constructor" autowire-candidate="true">
+	</bean>
+
 	<bean id="transformationService" class="com.lithium.streams.compliance.beans.TransformationServiceImpl" autowire="constructor"
 		autowire-candidate="true">
 	</bean>
@@ -18,6 +30,9 @@
 	</bean>
 	<bean id="consumeEventsService" class="com.lithium.streams.compliance.beans.ConsumeEventsServiceImpl" autowire="constructor"
 		autowire-candidate="true">
+		<constructor-arg>
+			<ref bean="streamCache" />
+		</constructor-arg>
 	</bean>
-	
+
 </beans>

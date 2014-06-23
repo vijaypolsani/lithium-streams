@@ -1,6 +1,9 @@
-package com.lithium.streams.compliance.service;
+package com.lithium.streams.compliance.service.ws;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
+import java.util.Deque;
 import java.util.concurrent.ExecutionException;
 
 import javax.ws.rs.DefaultValue;
@@ -18,17 +21,26 @@ import org.glassfish.jersey.media.sse.OutboundEvent;
 import org.glassfish.jersey.media.sse.SseFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
-import com.lithium.streams.compliance.consumer.ConsumerGroup;
+import com.lithium.streams.compliance.beans.ConsumeEventsService;
+import com.lithium.streams.compliance.exception.ComplianceServiceException;
 
 @Path("/")
 public class ComplianceService {
 	private static final String ZK_HOSTNAME_URL = "10.240.163.94:2181";
 	private static final String ZK_TIMEOUT = "5000";
 	private static final Logger log = LoggerFactory.getLogger(ComplianceService.class);
+	private static ApplicationContext appContext = new ClassPathXmlApplicationContext(
+			"classpath*:/spring/appContext.xml");
+
+	//@Autowired
+	private ConsumeEventsService consumeEventsService = (ConsumeEventsService) appContext
+			.getBean("consumeEventsService");;
 
 	/**
 	 * API for REAL TIME consumption of the events based on a given Community & User login.
@@ -47,54 +59,42 @@ public class ComplianceService {
 	@ExceptionMetered
 	public EventOutput getLiveEvents(@PathParam("communityName") String communityName,
 			@DefaultValue("demo") @QueryParam("login") String login) throws InterruptedException, ExecutionException {
+
+		checkNotNull(login, new WebApplicationException("Login Parameter Cannot be NULL", Response.Status.BAD_REQUEST));
+		checkNotNull(communityName, new WebApplicationException("CommunityName Cannot be NULL",
+				Response.Status.BAD_REQUEST));
+
 		final EventOutput eventOutput = new EventOutput();
-		if (login == null) {
-			log.info(">>> Login name cannot be empty. Hence using DEMO user as default.");
-		}
-		if (communityName == null) {
-			try {
-				eventOutput.write(new OutboundEvent.Builder().data(String.class,
-						"Community Name cannot be Empty or NULL").build());
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			return eventOutput;
-		}
-		//Preconditions.checkArgument(login == null, "Community Name cannot be NULL");
+		final OutboundEvent.Builder eventBuilder = new OutboundEvent.Builder();
+		eventBuilder.name("Compliance_Service_SSE_Lia_Events");
+
+		//TODO:
+		// Preconditions.checkArgument(login == null, "Community Name cannot be NULL");
 		// Should I have a new Thread for every customer to Kafka? Ideally I want to create a 
 		// new ConsumerGroup for every Customer Login name. I can keep the thread or discard. If I generalize here,
-		// then there could be events missing for this client.... TODO: More strategies...
-		final String consumerGroupId = communityName + login;
-		final ConsumerGroup consumerGroup = new ConsumerGroup(ZK_HOSTNAME_URL, ZK_TIMEOUT, communityName,
-				consumerGroupId);
-		final Thread customerStreamThread = new Thread("ComplianceServiceThread") {
-			@Override
-			public void run() {
-				try {
-					final OutboundEvent.Builder eventBuilder = new OutboundEvent.Builder();
-					eventBuilder.name("Compliance_Service_SSE_Events");
-					while (true) {
-						// Hide the low level Thread Sync details after DEMO
-						synchronized (consumerGroup.getLock()) {
-							String str = consumerGroup.getLock().getJsonContent();
-							if (str != null) {
-								eventBuilder.data(String.class, str);
-								final OutboundEvent event = eventBuilder.build();
-								eventOutput.write(event);
-							} else
-								log.info(">>> Data read not started yet. Wait on stream ... " + str);
-							consumerGroup.getLock().wait();
-						}
-					}
-				} catch (IOException io) {
-					log.error("<<< Looks like the current Active Thread serving Request is dead. Try create new thread & serve reqeust.");
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-					throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
-				}
+		// then there could be events missing for this client.... 
+		// More strategies...
+
+		//TODO: Implement Facade pattern here. For a give Community-Check Cache to bring already streaming data
+		log.info(">>> In Compliance Service. ThreadStackTrace: ID: " + Thread.currentThread().getId() + " Name: "
+				+ Thread.currentThread().getName());
+
+		// Log for Spring Beans.
+		log.info(">>> consumeEventsService Stats: " + consumeEventsService.toString());
+
+		Deque<String> data = consumeEventsService.consumeEvents(communityName, login);
+		//TODO: Subscribe to event BUS for a given TOPIC. The below may not WORK!
+		while (data.peek() != null) {
+			eventBuilder.data(String.class, data.pop());
+			final OutboundEvent event = eventBuilder.build();
+			try {
+				eventOutput.write(event);
+			} catch (IOException e) {
+				e.printStackTrace();
+				log.error("Exception in writing to SSE object eventOutput." + e.getLocalizedMessage());
+				throw new ComplianceServiceException("LI001", "Exception in writing to SSE object eventOutput.", e);
 			}
-		};
-		customerStreamThread.start();
+		}
 		return eventOutput;
 	}
 
