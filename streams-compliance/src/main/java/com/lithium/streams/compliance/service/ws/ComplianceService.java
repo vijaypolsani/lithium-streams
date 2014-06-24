@@ -37,12 +37,10 @@ import com.lithium.streams.compliance.util.StreamEventBusListener;
 
 @Path("/")
 public class ComplianceService {
-	private static final String ZK_HOSTNAME_URL = "10.240.163.94:2181";
-	private static final String ZK_TIMEOUT = "5000";
+
 	private static final Logger log = LoggerFactory.getLogger(ComplianceService.class);
 	private static ApplicationContext appContext = new ClassPathXmlApplicationContext(
 			"classpath*:/spring/appContext.xml");
-	//private Deque<ComplianceEvent> subscriberData = new ConcurrentLinkedDeque<ComplianceEvent>();
 	private Queue<ComplianceEvent> subscriberData = new ArrayDeque<ComplianceEvent>();
 	//@Autowired
 	private ConsumeEventsService consumeEventsService = (ConsumeEventsService) appContext
@@ -70,10 +68,6 @@ public class ComplianceService {
 		checkNotNull(communityName, new WebApplicationException("CommunityName Cannot be NULL",
 				Response.Status.BAD_REQUEST));
 
-		final EventOutput eventOutput = new EventOutput();
-		final OutboundEvent.Builder eventBuilder = new OutboundEvent.Builder();
-		eventBuilder.name("Compliance_Service_SSE_Lia_Events");
-
 		//TODO:
 		// Preconditions.checkArgument(login == null, "Community Name cannot be NULL");
 		// Should I have a new Thread for every customer to Kafka? Ideally I want to create a 
@@ -87,6 +81,10 @@ public class ComplianceService {
 
 		// Log for Spring Beans.
 		log.info(">>> consumeEventsService : " + consumeEventsService.toString());
+
+		final EventOutput eventOutput = new EventOutput();
+		final OutboundEvent.Builder eventBuilder = new OutboundEvent.Builder();
+		eventBuilder.name("Compliance_Service_SSE_Lia_Events");
 
 		class StreamEventBusListenerImpl implements StreamEventBusListener {
 			@Subscribe
@@ -107,7 +105,11 @@ public class ComplianceService {
 			}
 
 		}
-		consumeEventsService.consumeEvents(communityName, login, new StreamEventBusListenerImpl());
+		try {
+			consumeEventsService.consumeEvents(communityName, login, new StreamEventBusListenerImpl());
+		} catch (ComplianceServiceException cs) {
+			consumeEventsService.consumeEvents(communityName, login, new StreamEventBusListenerImpl());
+		}
 		return eventOutput;
 	}
 

@@ -7,13 +7,14 @@ import com.lithium.streams.compliance.model.ActivityStreams;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnResizeEvent;
-import com.vaadin.ui.VerticalLayout;
 
 public class FormatData {
+	private static long counter = 0L;
 
 	public static HorizontalLayout processData(HorizontalLayout layout, ActivityStreams activityStreams) {
 		layout.removeAllComponents();
-		final Table table = new Table("Lithium Activity Streams. Last Update Time: " + getCurrentTime());
+		final Table table = new Table(" Count: ( " + getCounter() + " ). Last Update Time: ["
+				+ getCurrentTime() + " ]");
 		table.setStyleName("title");
 		table.removeAllItems();
 		table.addContainerProperty("Activity Streams Property", String.class, null);
@@ -83,5 +84,9 @@ public class FormatData {
 	private static String getCurrentTime() {
 		Date date = Calendar.getInstance().getTime();
 		return date.toString();
+	}
+
+	private static long getCounter() {
+		return counter++;
 	}
 }

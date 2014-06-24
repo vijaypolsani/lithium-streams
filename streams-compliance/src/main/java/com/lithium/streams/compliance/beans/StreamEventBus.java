@@ -16,8 +16,8 @@ public class StreamEventBus {
 		eventBus = new AsyncEventBus(MoreExecutors.sameThreadExecutor());
 	}
 
-	public void unRegisterSubscriber(ComplianceEvent comlianceEvent) {
-		eventBus.unregister(comlianceEvent);
+	public void unRegisterSubscriber(StreamEventBusListener streamEventBusListener) {
+		eventBus.unregister(streamEventBusListener);
 	}
 
 	public void postEvent(ComplianceEvent comlianceEvent) {

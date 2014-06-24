@@ -9,6 +9,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.lithium.streams.compliance.beans.ConsumeEventsServiceImpl;
 import com.lithium.streams.compliance.beans.StreamEventBus;
+import com.lithium.streams.compliance.exception.ComplianceServiceException;
 import com.lithium.streams.compliance.model.LiaPostEvent;
 import com.lithium.streams.compliance.util.StreamEventBusListener;
 
@@ -46,7 +47,12 @@ public class ConsumeMessages extends Thread {
 					if (str != null) {
 						log.info(">>> Inside ConsumeMessages sleeping for 1sec.");
 						Thread.sleep(1000);
-						streamEventBus.postEvent(new LiaPostEvent(str));
+						try {
+							streamEventBus.postEvent(new LiaPostEvent(str));
+						} catch (ComplianceServiceException cs) {
+							streamEventBus.unRegisterSubscriber(streamEventBusListener);
+							throw new ComplianceServiceException("LI002", "Unregistred the listener. Reregister.", cs);
+						}
 					}
 					consumerGroup.getLock().wait();
 				}
