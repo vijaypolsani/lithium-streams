@@ -30,7 +30,8 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 
-@Theme("reindeer")
+@Theme("streams")
+//@Theme("runo")
 @SuppressWarnings("serial")
 public class ActivityStreamsClient extends UI {
 	private static final String STREAMS_URL = "http://localhost:6060/compliance/live/actiance.qa?login=actiance";

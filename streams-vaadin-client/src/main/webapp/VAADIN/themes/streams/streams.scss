@@ -6,7 +6,42 @@
 /* If somebody wants to extend the theme she will include this mixin. */
 @mixin streams {
   /* Include all the styles from the reindeer theme */
-  @include reindeer;
-
+@include reindeer;
+ 
   /* Insert your theme rules here */
+
+  /* White background for the entire UI */
+  .v-ui {
+    background: white;
+  }
+  .h-ui {
+    background: white;
+  }
+  
+  /* All labels have white text on black background */
+  .v-label {
+    background: black;
+    color: white;
+    font-size: 12pt;
+    line-height: 12pt;
+    padding: 5px;
+  }
+
+  .h-label {
+    background: black;
+    color: white;
+    font-size: 12pt;
+    line-height: 12pt;
+    padding: 5px;
+  }
+
+  /* All buttons have blue caption and some margin */
+  .v-button {
+    margin: 10px;
+
+    /* A nested selector to increase specificity */
+    .v-button-caption {
+      color: blue;
+    }
+  }
 }

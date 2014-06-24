@@ -13,7 +13,7 @@ public class FormatData {
 
 	public static HorizontalLayout processData(HorizontalLayout layout, ActivityStreams activityStreams) {
 		layout.removeAllComponents();
-		final Table table = new Table(" Count: ( " + getCounter() + " ). Last Update Time: ["
+		final Table table = new Table(" Events: [ " + getCounter() + " ]    Last Refresh: [ "
 				+ getCurrentTime() + " ]");
 		table.setStyleName("title");
 		table.removeAllItems();

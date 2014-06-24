@@ -7063,3 +7063,35 @@ body .streams.v-app .v-app-loading {
 	background: transparent repeat-x;
 	background-image: url(../reindeer/window/img/black/content-bg.png);/** sprite-ref: black-verticals; sprite-alignment: repeat */
 }
+
+.streams .v-ui {
+	background: white;
+}
+
+.streams .h-ui {
+	background: white;
+}
+
+.streams .v-label {
+	background: black;
+	color: white;
+	font-size: 12pt;
+	line-height: 12pt;
+	padding: 5px;
+}
+
+.streams .h-label {
+	background: black;
+	color: white;
+	font-size: 12pt;
+	line-height: 12pt;
+	padding: 5px;
+}
+
+.streams .v-button {
+	margin: 10px;
+}
+
+.streams .v-button .v-button-caption {
+	color: blue;
+}
