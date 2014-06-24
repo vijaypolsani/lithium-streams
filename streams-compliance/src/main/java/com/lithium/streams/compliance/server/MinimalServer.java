@@ -94,7 +94,7 @@ public class MinimalServer {
 		System.out.println(">>> List of Spring Instantiated Beans: " + ListOfSpringBeans.getInstantiatedSigletons(appContext));
 
 		PropertyConfigurator
-				.configure("/Users/vijay.polsani/_eclipseworkspace/lithium-streams/streams-compliance/src/main/Resources/conf/log4j.properties");
+				.configure("./log4j.properties");
 
 		Server server = new Server(threadPool);
 		//Server server = new Server();

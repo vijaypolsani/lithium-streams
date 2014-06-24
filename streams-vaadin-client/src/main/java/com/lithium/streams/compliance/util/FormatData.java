@@ -13,8 +13,7 @@ public class FormatData {
 
 	public static HorizontalLayout processData(HorizontalLayout layout, ActivityStreams activityStreams) {
 		layout.removeAllComponents();
-		final Table table = new Table(" Events: [ " + getCounter() + " ]    Last Refresh: [ "
-				+ getCurrentTime() + " ]");
+		final Table table = new Table(" Events: [ " + getCounter() + " ]    Last Refresh: [ " + getCurrentTime() + " ]");
 		table.setStyleName("title");
 		table.removeAllItems();
 		table.addContainerProperty("Activity Streams Property", String.class, null);
@@ -87,6 +86,6 @@ public class FormatData {
 	}
 
 	private static long getCounter() {
-		return counter++;
+		return ++counter;
 	}
 }
