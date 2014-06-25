@@ -32,6 +32,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.health.HealthCheckRegistry;
 import com.codahale.metrics.servlets.AdminServlet;
 import com.lithium.streams.compliance.beans.StreamCache;
+import com.lithium.streams.compliance.consumer.ConsumeMessages;
 import com.lithium.streams.compliance.service.ws.ComplianceService;
 import com.lithium.streams.compliance.util.DumpServlet;
 import com.lithium.streams.compliance.util.ListOfSpringBeans;
@@ -57,6 +58,13 @@ public class MinimalServer {
 		rsServletHolder.setInitParameter("jersey.config.server.provider.packages", "org.streams.compliance.service");
 		resourceConfig.packages(ComplianceService.class.getPackage().getName());
 		resourceConfig.register(JacksonFeature.class);
+
+		resourceConfig.register(com.lithium.streams.compliance.beans.StreamEventBus.class);
+		resourceConfig.register(com.lithium.streams.compliance.beans.StreamCache.class);
+		resourceConfig.register(com.lithium.streams.compliance.beans.ConsumeEventsService.class);
+		resourceConfig.register(ConsumeMessages.class);
+		resourceConfig.register(ComplianceService.class);
+
 		ServletContainer servletContainer = new ServletContainer(resourceConfig);
 		ServletHolder sh = new ServletHolder(servletContainer);
 
@@ -64,14 +72,18 @@ public class MinimalServer {
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 		context.setContextPath("/");
 
-		// Add REST Servlet
-		context.addServlet(sh, "/compliance/*");
-
 		//CodeHale param
 		context.setAttribute("com.codahale.metrics.servlets.MetricsServlet.registry", registry);
 		context.setAttribute("com.codahale.metrics.servlets.HealthCheckServlet.registry", healthCheckRegistry);
 		context.setInitParameter("com.codahale.metrics.servlets.MetricsServlet.allowedOrigin", "*");
 		context.setAttribute("com.codahale.metrics.servlets.HealthCheckServlet.executor", threadPoolExecutors);
+
+		// Setup context listener
+		context.addEventListener(new org.springframework.web.context.ContextLoaderListener());
+		context.setInitParameter("contextConfigLocation", "classpath*:/spring/appContext.xml");
+
+		// Add REST Servlet
+		context.addServlet(sh, "/compliance/*");
 
 		// Add servlets
 		context.addServlet(new ServletHolder(new AdminServlet()), "/admin/*");
@@ -83,18 +95,7 @@ public class MinimalServer {
 		//context.addServlet(new ServletHolder(new PingServlet()), "/ping/*");
 		//context.addServlet(new ServletHolder(new ThreadDumpServlet()), "/tdump/*");
 
-		// Setup Spring context
-		context.addEventListener(new ContextLoaderListener());
-		context.setInitParameter("contextConfigLocation", "classpath*:/spring/appContext.xml");
-
-		// Log for Spring Beans.
-		ApplicationContext appContext = new ClassPathXmlApplicationContext("classpath*:/spring/appContext.xml");
-		StreamCache streamCache = (StreamCache) appContext.getBean("streamCache");
-		System.out.println(">>> SpringCache Stats: " + streamCache.getCache().stats());
-		System.out.println(">>> List of Spring Instantiated Beans: " + ListOfSpringBeans.getInstantiatedSigletons(appContext));
-
-		PropertyConfigurator
-				.configure("./log4j.properties");
+		PropertyConfigurator.configure("./log4j.properties");
 
 		Server server = new Server(threadPool);
 		//Server server = new Server();
@@ -103,8 +104,6 @@ public class MinimalServer {
 
 		HttpConfiguration http_config = new HttpConfiguration();
 		http_config.setSecureScheme("https");
-		http_config.setSecurePort(7443);
-		http_config.setOutputBufferSize(32768);
 
 		Connector[] connectors = new Connector[2];
 		connectors[0] = setHttpConfiguration(server, http_config);
@@ -130,7 +129,7 @@ public class MinimalServer {
 	private static ServerConnector setHttpsConfiguration(Server server, HttpConfiguration http_config) {
 		SslContextFactory sslContextFactory = new SslContextFactory();
 		System.out.println("user.home " + System.getProperty("user.home"));
-		sslContextFactory.setKeyStorePath(System.getProperty("user.home") + "/keystore.jks");
+		sslContextFactory.setKeyStorePath("./keystore.jks");
 		sslContextFactory.setKeyStorePassword("changeme");
 		sslContextFactory.setKeyManagerPassword("changeme");
 

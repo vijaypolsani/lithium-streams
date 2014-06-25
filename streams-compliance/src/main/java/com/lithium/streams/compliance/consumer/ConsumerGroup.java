@@ -55,8 +55,7 @@ public class ConsumerGroup {
 		return new ConsumerConfig(props);
 	}
 
-	public void createThreadPool() throws InterruptedException, ExecutionException {
-		Future<List<String>> tasks = null;
+	private void createThreadPool() throws InterruptedException, ExecutionException {
 		Map<String, Integer> topicCountMap = new HashMap<String, Integer>();
 		topicCountMap.put(topicName, new Integer(numberOfThreads));
 		Map<String, List<KafkaStream<byte[], byte[]>>> consumerStreams = consumer.createMessageStreams(topicCountMap);

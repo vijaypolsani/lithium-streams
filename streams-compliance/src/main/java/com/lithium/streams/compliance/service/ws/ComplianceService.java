@@ -3,10 +3,9 @@ package com.lithium.streams.compliance.service.ws;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.Queue;
 import java.util.concurrent.ExecutionException;
 
+import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -22,8 +21,6 @@ import org.glassfish.jersey.media.sse.OutboundEvent;
 import org.glassfish.jersey.media.sse.SseFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Metered;
@@ -31,6 +28,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 import com.lithium.streams.compliance.beans.ConsumeEventsService;
+import com.lithium.streams.compliance.beans.StreamEventBus;
 import com.lithium.streams.compliance.exception.ComplianceServiceException;
 import com.lithium.streams.compliance.model.ComplianceEvent;
 import com.lithium.streams.compliance.util.StreamEventBusListener;
@@ -39,12 +37,11 @@ import com.lithium.streams.compliance.util.StreamEventBusListener;
 public class ComplianceService {
 
 	private static final Logger log = LoggerFactory.getLogger(ComplianceService.class);
-	private static ApplicationContext appContext = new ClassPathXmlApplicationContext(
-			"classpath*:/spring/appContext.xml");
-	private Queue<ComplianceEvent> subscriberData = new ArrayDeque<ComplianceEvent>();
-	//@Autowired
-	private ConsumeEventsService consumeEventsService = (ConsumeEventsService) appContext
-			.getBean("consumeEventsService");
+
+	@Inject
+	private ConsumeEventsService consumeEventsService;
+	@Inject
+	private StreamEventBus streamEventBus;
 
 	/**
 	 * API for REAL TIME consumption of the events based on a given Community & User login.
@@ -80,13 +77,15 @@ public class ComplianceService {
 				+ Thread.currentThread().getName());
 
 		// Log for Spring Beans.
-		log.info(">>> consumeEventsService : " + consumeEventsService.toString());
+		log.info(">>> Spring bean lookup - consumeEventsService : " + consumeEventsService.hashCode());
+		log.info(">>> Spring bean lookup - streamEventBus : " + streamEventBus.hashCode());
 
 		final EventOutput eventOutput = new EventOutput();
 		final OutboundEvent.Builder eventBuilder = new OutboundEvent.Builder();
 		eventBuilder.name("Compliance_Service_SSE_Lia_Events");
 
 		class StreamEventBusListenerImpl implements StreamEventBusListener {
+
 			@Subscribe
 			@AllowConcurrentEvents
 			public void readEvents(ComplianceEvent complianceEvent) {
@@ -105,21 +104,9 @@ public class ComplianceService {
 			}
 
 		}
-		try {
-			consumeEventsService.consumeEvents(communityName, login, new StreamEventBusListenerImpl());
-		} catch (ComplianceServiceException cs) {
-			consumeEventsService.consumeEvents(communityName, login, new StreamEventBusListenerImpl());
-		}
+		streamEventBus.registerSubscriber(new StreamEventBusListenerImpl());
+		consumeEventsService.consumeEvents(communityName, login);
 		return eventOutput;
-	}
-
-	@Subscribe
-	@AllowConcurrentEvents
-	public void readEvent(ComplianceEvent complianceEvent) {
-		//log.info(">>> LiaPostEvent Subscribed in this ***: " + complianceEvent.getEvent());
-		log.info(">>> LiaPostEvent inside Subscriber: " + complianceEvent.getEvent());
-		log.info(">>> LiaPostEvent subscriberData Size: " + subscriberData.size());
-		subscriberData.add(complianceEvent);
 	}
 
 	/**

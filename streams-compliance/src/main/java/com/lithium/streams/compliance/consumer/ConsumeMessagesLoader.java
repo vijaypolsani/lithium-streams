@@ -11,7 +11,7 @@ public class ConsumeMessagesLoader extends CacheLoader<String, ConsumeMessages> 
 		super();
 	}
 
-	//TODO: The NULL loader will not WORK. Need a new instance of the Service.
+	//TODO: The parameter cannot be NULL. It has to be StreamEventBus instance from bean
 	@Override
 	public ConsumeMessages load(String key) throws Exception {
 		return new ConsumeMessages(key, ZK_HOSTNAME_URL, ZK_TIMEOUT, TOPIC_NAME, key, null);

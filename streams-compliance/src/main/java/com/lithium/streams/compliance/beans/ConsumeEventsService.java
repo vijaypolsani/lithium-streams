@@ -6,7 +6,7 @@ import com.lithium.streams.compliance.util.StreamEventBusListener;
 
 public interface ConsumeEventsService {
 
-	public abstract void consumeEvents(String communityName, String login, StreamEventBusListener streamEventBusListener)
+	public abstract void consumeEvents(String communityName, String login)
 			throws InterruptedException, ExecutionException;
 
 }
