@@ -1,5 +1,7 @@
 package com.lithium.streams.compliance.util;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -44,6 +46,7 @@ public final class JsonMessageParser {
 	}
 
 	public String parseIncomingsJsonStream(final String inputJsonStream) throws IOException {
+		checkNotNull(inputJsonStream, "Message JSON that need to be parsed cannot be null.");
 		try {
 			JsonParser jsonParser = jsonFactory.createParser(inputJsonStream);
 			JsonToken jsonToken = jsonParser.nextToken();

@@ -89,8 +89,7 @@ public class ComplianceService {
 			@Subscribe
 			@AllowConcurrentEvents
 			public void readEvents(ComplianceEvent complianceEvent) {
-				log.info(">>> LiaPostEvent Subscribed inner class StreamEventBusListenerImpl: "
-						+ complianceEvent.getEvent());
+				//log.info(">>> LiaPostEvent Subscribed inner class StreamEventBusListenerImpl: "+ complianceEvent.getEvent());
 				eventBuilder.data(String.class, complianceEvent.getEvent());
 				final OutboundEvent event = eventBuilder.build();
 				try {

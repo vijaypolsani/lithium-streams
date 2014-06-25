@@ -1,5 +1,7 @@
 package com.lithium.streams.compliance.util;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +35,9 @@ public final class JsonMessageFilter {
 	}
 
 	public boolean parseIncomingsJsonStream(final String inputJsonStream, final String matchingId) throws IOException {
+		checkNotNull(inputJsonStream, "Message JSON that need to be parsed cannot be null.");
+		checkNotNull(matchingId, "Message JSON filter criteria cannot be null.");
+
 		Boolean source = false;
 		try {
 			JsonParser jsonParser = jsonFactory.createParser(inputJsonStream);

@@ -29,8 +29,6 @@ public class StreamCache {
 		cache = CacheBuilder.newBuilder().maximumSize(1000).expireAfterAccess(7, TimeUnit.DAYS).build();
 	}
 
-	@GET
-	@Produces(MediaType.TEXT_PLAIN)
 	public Cache<String, ConsumeMessages> getCache() {
 		return cache;
 	}
@@ -40,29 +38,10 @@ public class StreamCache {
 		return "StreamCache [cache=" + cache.asMap().keySet().toArray().toString() + "]";
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((cache == null) ? 0 : cache.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		StreamCache other = (StreamCache) obj;
-		if (cache == null) {
-			if (other.cache != null)
-				return false;
-		} else if (!cache.equals(other.cache))
-			return false;
-		return true;
+	@GET
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getStats() {
+		return cache.stats().toString();
 	}
 
 }

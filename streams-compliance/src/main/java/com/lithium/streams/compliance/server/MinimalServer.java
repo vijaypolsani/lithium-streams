@@ -62,7 +62,7 @@ public class MinimalServer {
 		resourceConfig.register(com.lithium.streams.compliance.beans.StreamEventBus.class);
 		resourceConfig.register(com.lithium.streams.compliance.beans.StreamCache.class);
 		resourceConfig.register(com.lithium.streams.compliance.beans.ConsumeEventsService.class);
-		resourceConfig.register(ConsumeMessages.class);
+		//resourceConfig.register(ConsumeMessages.class);
 		resourceConfig.register(ComplianceService.class);
 
 		ServletContainer servletContainer = new ServletContainer(resourceConfig);
