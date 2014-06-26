@@ -27,14 +27,13 @@ public class ConsumeMessages extends Thread {
 	}
 
 	public void run() {
-		//TODO: Publish to Event BUS. The below may not WORK!
 		log.info(">>> Created ConsumeMessages thread for reading data from Kafka.");
 		try {
 			while (true) {
 				//TODO: Hide the low level Thread Sync details after Performance. Remove STR and get Direct JSON Content
 				synchronized (consumerGroup.getLock()) {
 					String str = consumerGroup.getLock().getJsonContent();
-					//log.info(">>> In ConsumeMessages Thread. Reading content : " + str);
+					log.info(">>> In ConsumeMessages Thread. Reading content : " + str);
 					if (str != null) {
 						log.info(">>> Inside ConsumeMessages sleeping for 1sec. ");
 						Thread.sleep(1000);

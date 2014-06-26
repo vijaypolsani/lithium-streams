@@ -9,11 +9,11 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnResizeEvent;
 
 public class FormatData {
-	private static long counter = 0L;
+	long counter = 0L;
 
-	public static HorizontalLayout processData(HorizontalLayout layout, ActivityStreams activityStreams) {
+	public static HorizontalLayout processData(HorizontalLayout layout, ActivityStreams activityStreams, long counter) {
 		layout.removeAllComponents();
-		final Table table = new Table(" Events: [ " + getCounter() + " ]    Last Refresh: [ " + getCurrentTime() + " ]");
+		final Table table = new Table(" Events: [ " + counter + " ]    Last Refresh: [ " + getCurrentTime() + " ]");
 		table.setStyleName("title");
 		table.removeAllItems();
 		table.addContainerProperty("Activity Streams Property", String.class, null);
@@ -83,9 +83,5 @@ public class FormatData {
 	private static String getCurrentTime() {
 		Date date = Calendar.getInstance().getTime();
 		return date.toString();
-	}
-
-	private static long getCounter() {
-		return ++counter;
 	}
 }

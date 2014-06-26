@@ -3,6 +3,7 @@ package com.lithium.streams.compliance.service.ws;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
@@ -37,6 +38,8 @@ import com.lithium.streams.compliance.util.StreamEventBusListener;
 public class ComplianceService {
 
 	private static final Logger log = LoggerFactory.getLogger(ComplianceService.class);
+	private static final String COMMUNITY_NAME = "actiance.qa";
+	private static final String LOGIN = "demo";
 
 	@Inject
 	private ConsumeEventsService consumeEventsService;
@@ -52,40 +55,38 @@ public class ComplianceService {
 	 * @throws ExecutionException
 	 */
 	@GET
-	@Path("live/{communityName}")
+	@Path("live")
+	//@Path("live/{communityName}")
 	//@Produces(MediaType.APPLICATION_JSON)
 	@Produces(SseFeature.SERVER_SENT_EVENTS)
 	@Timed
 	@Metered
 	@ExceptionMetered
+	/*
 	public EventOutput getLiveEvents(@PathParam("communityName") String communityName,
 			@DefaultValue("demo") @QueryParam("login") String login) throws InterruptedException, ExecutionException {
 
 		checkNotNull(login, new WebApplicationException("Login Parameter Cannot be NULL", Response.Status.BAD_REQUEST));
 		checkNotNull(communityName, new WebApplicationException("CommunityName Cannot be NULL",
 				Response.Status.BAD_REQUEST));
+	*/
+	public EventOutput getLiveEvents() throws InterruptedException, ExecutionException {
 
 		//TODO:
-		// Preconditions.checkArgument(login == null, "Community Name cannot be NULL");
 		// Should I have a new Thread for every customer to Kafka? Ideally I want to create a 
 		// new ConsumerGroup for every Customer Login name. I can keep the thread or discard. If I generalize here,
 		// then there could be events missing for this client.... 
-		// More strategies...
 
 		//TODO: Implement Facade pattern here. For a give Community-Check Cache to bring already streaming data
+
 		log.info(">>> In Compliance Service. ThreadStackTrace: ID: " + Thread.currentThread().getId() + " Name: "
 				+ Thread.currentThread().getName());
-
-		// Log for Spring Beans.
-		log.info(">>> Spring bean lookup - consumeEventsService : " + consumeEventsService.hashCode());
-		log.info(">>> Spring bean lookup - streamEventBus : " + streamEventBus.hashCode());
 
 		final EventOutput eventOutput = new EventOutput();
 		final OutboundEvent.Builder eventBuilder = new OutboundEvent.Builder();
 		eventBuilder.name("Compliance_Service_SSE_Lia_Events");
 
-		class StreamEventBusListenerImpl implements StreamEventBusListener {
-
+		final class StreamEventBusListenerImpl implements StreamEventBusListener {
 			@Subscribe
 			@AllowConcurrentEvents
 			public void readEvents(ComplianceEvent complianceEvent) {
@@ -101,10 +102,10 @@ public class ComplianceService {
 					throw new ComplianceServiceException("LI001", "Exception in writing to SSE object eventOutput.", e);
 				}
 			}
-
 		}
 		streamEventBus.registerSubscriber(new StreamEventBusListenerImpl());
-		consumeEventsService.consumeEvents(communityName, login);
+		consumeEventsService.consumeEvents(COMMUNITY_NAME, LOGIN);
+		//consumeEventsService.consumeEvents(communityName, login);
 		return eventOutput;
 	}
 
@@ -118,7 +119,6 @@ public class ComplianceService {
 	* @throws InterruptedException
 	* @throws ExecutionException
 	*/
-
 	@GET
 	@Path("bulk/time/{communityName}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -189,7 +189,7 @@ public class ComplianceService {
 	@ExceptionMetered
 	public String getBatchLatestEndTime(@PathParam("communityName") String communityName,
 			@DefaultValue("demo") @QueryParam("login") String login) throws InterruptedException, ExecutionException {
-		return "TODAY.2.30.PST";
+		return Calendar.getInstance().getTime().toString();
 	}
 
 }

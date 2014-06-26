@@ -34,7 +34,7 @@ import com.vaadin.ui.UI;
 //@Theme("runo")
 @SuppressWarnings("serial")
 public class ActivityStreamsClient extends UI {
-	private static final String STREAMS_URL = "http://localhost:6060/compliance/live/actiance.qa?login=actiance";
+	private static final String STREAMS_URL = "http://localhost:6060/compliance/live";
 	//private static final String STREAMS_URL = "http://10.240.180.18:6060/compliance/live/actiance.qa?login=demo";
 	private static final Logger log = LoggerFactory.getLogger(ActivityStreamsClient.class);
 
@@ -61,7 +61,6 @@ public class ActivityStreamsClient extends UI {
 		layout.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
 		timeLabel.setSizeUndefined();
 		eventData.setSizeUndefined();
-		layout.addComponent(new Label());
 		layout.addComponent(timeLabel);
 		layout.addComponent(eventData);
 		getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
@@ -79,7 +78,6 @@ public class ActivityStreamsClient extends UI {
 	}
 
 	private class EndlessRefresherRunnable implements Runnable {
-		int j = 0;
 		LabelUpdateRunnable labelUpdateRunnable = new LabelUpdateRunnable();
 
 		@Override
@@ -97,16 +95,18 @@ public class ActivityStreamsClient extends UI {
 		}
 
 		final class LabelUpdateRunnable implements Runnable {
+			long counter = 0L;
+
 			@Override
 			public void run() {
 				timeLabel.setValue(" Current Time: " + getCurrentTime());
-				log.info(">>> Iteration of the page Regresh: " + j++ + " Time: " + getCurrentTime());
+				log.info(">>> Iteration of the page Regresh: " + ++counter + " Time: " + getCurrentTime());
 				if (queue.peek() != null) {
 					String data = queue.pop();
 					//Label title = new Label("Lithium Compliance Service");
 					try {
 						layout = FormatData.processData(layout, JsonMessageParser
-								.parseIncomingsJsonStreamToObject(data));
+								.parseIncomingsJsonStreamToObject(data), counter);
 						layout.setCaption("Lithium Compliance Service Real Time Events");
 						layout.setMargin(true);
 						layout.setSpacing(true);
@@ -138,7 +138,6 @@ public class ActivityStreamsClient extends UI {
 
 		public void run() {
 			try {
-				log.info(">>> Created for Target . Itegration: " + i);
 				EventSource eventSource = new EventSource(webTarget) {
 					@Override
 					public void onEvent(InboundEvent inboundEvent) {
