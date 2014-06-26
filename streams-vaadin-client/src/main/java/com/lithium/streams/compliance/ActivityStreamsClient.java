@@ -34,8 +34,8 @@ import com.vaadin.ui.UI;
 //@Theme("runo")
 @SuppressWarnings("serial")
 public class ActivityStreamsClient extends UI {
-	private static final String STREAMS_URL = "http://localhost:6060/compliance/live";
-	//private static final String STREAMS_URL = "http://10.240.180.18:6060/compliance/live/actiance.qa?login=demo";
+	private static final String STREAMS_URL = "http://localhost:6060/compliance/v1/live";
+	//private static final String STREAMS_URL = "http://10.240.180.18:6060/compliance/v1/live/actiance.qa?login=demo";
 	private static final Logger log = LoggerFactory.getLogger(ActivityStreamsClient.class);
 
 	private Label timeLabel = new Label("Loading UI, please wait...");

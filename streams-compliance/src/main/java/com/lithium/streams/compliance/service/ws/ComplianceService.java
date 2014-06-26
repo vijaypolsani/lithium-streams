@@ -34,7 +34,7 @@ import com.lithium.streams.compliance.exception.ComplianceServiceException;
 import com.lithium.streams.compliance.model.ComplianceEvent;
 import com.lithium.streams.compliance.util.StreamEventBusListener;
 
-@Path("/")
+@Path("/v1")
 public class ComplianceService {
 
 	private static final Logger log = LoggerFactory.getLogger(ComplianceService.class);
@@ -55,7 +55,7 @@ public class ComplianceService {
 	 * @throws ExecutionException
 	 */
 	@GET
-	@Path("live")
+	@Path("/live")
 	//@Path("live/{communityName}")
 	//@Produces(MediaType.APPLICATION_JSON)
 	@Produces(SseFeature.SERVER_SENT_EVENTS)
