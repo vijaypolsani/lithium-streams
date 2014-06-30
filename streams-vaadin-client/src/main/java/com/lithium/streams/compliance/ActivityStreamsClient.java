@@ -11,6 +11,9 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import javax.servlet.annotation.WebServlet;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.core.Configuration;
+import javax.ws.rs.core.UriBuilder;
 
 import org.glassfish.jersey.media.sse.EventSource;
 import org.glassfish.jersey.media.sse.InboundEvent;
@@ -34,8 +37,13 @@ import com.vaadin.ui.UI;
 //@Theme("runo")
 @SuppressWarnings("serial")
 public class ActivityStreamsClient extends UI {
-	private static final String STREAMS_URL = "http://localhost:6060/compliance/v1/live";
-	//private static final String STREAMS_URL = "http://10.240.180.18:6060/compliance/v1/live/actiance.qa?login=demo";
+
+	//private static final String STREAMS_API_PROXY_URL = "https://qa.lcloud.com/compliance/v1/live";
+	//private static final String STREAMS_URL = "http://localhost:6060/compliance/v1/live";
+	private static final String STREAMS_COMPLIANCE_URL = "http://10.240.180.18:6060/compliance/v1/live";
+
+	private static final String CLIENT_TOKEN = "client-id";
+	private static final String CLIENT_TOKEN_VALUE = "sCe9KITKh8+h1w4e9EDnVwzXBM8NjiilrWS6dOdMNr0=";
 	private static final Logger log = LoggerFactory.getLogger(ActivityStreamsClient.class);
 
 	private Label timeLabel = new Label("Loading UI, please wait...");
@@ -65,11 +73,9 @@ public class ActivityStreamsClient extends UI {
 		layout.addComponent(eventData);
 		getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
 		Client client = ClientBuilder.newBuilder().register(SseFeature.class).build();
-		try {
-			webTarget = client.target(new URI(STREAMS_URL));
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
+		webTarget = client.target(UriBuilder.fromPath(STREAMS_COMPLIANCE_URL));
+		webTarget.request("text/plain").header(CLIENT_TOKEN, CLIENT_TOKEN_VALUE).buildGet();
+		System.out.println("URL: " + webTarget.getUri());
 		Thread ui = new Thread(new EndlessRefresherRunnable());
 		ui.start();
 
@@ -103,7 +109,6 @@ public class ActivityStreamsClient extends UI {
 				log.info(">>> Iteration of the page Regresh: " + ++counter + " Time: " + getCurrentTime());
 				if (queue.peek() != null) {
 					String data = queue.pop();
-					//Label title = new Label("Lithium Compliance Service");
 					try {
 						layout = FormatData.processData(layout, JsonMessageParser
 								.parseIncomingsJsonStreamToObject(data), counter);
@@ -142,9 +147,14 @@ public class ActivityStreamsClient extends UI {
 					@Override
 					public void onEvent(InboundEvent inboundEvent) {
 						log.info(">>> Created for Target . onEvent: " + i);
-						String data = inboundEvent.readData();
-						queue.add(data);
-						log.info(">>> Event iteration: " + i++ + " Data: " + data);
+						String inboundEventData = inboundEvent.readData();
+						if (inboundEventData != null) {
+							queue.add(inboundEventData);
+							log.info(">>> Event iteration: " + i++ + " Data: " + inboundEventData);
+						} else {
+							log.error(">>> Event iteration: " + i++ + " - Connection is closed. ");
+
+						}
 					}
 				};
 			} catch (Exception e) {

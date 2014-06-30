@@ -19,14 +19,14 @@ public class RestClient {
 }
 
 class AsyncRequestProcessor implements Runnable {
-	private static final String STREAMS_URL = "http://localhost:6060/compliance/live/actiance.qa?login=vijay2";
+	private static final String STREAMS_URL = "https://qa.lcloud.com/compliance/v1/live";
 
 	public AsyncRequestProcessor() {
 		super();
 	}
 
 	public void run() {
-		Client client = ClientBuilder.newBuilder().register(SseFeature.class).build();
+		Client client = ClientBuilder.newBuilder().register(SseFeature.SERVER_SENT_EVENTS).build();
 		final javax.ws.rs.client.WebTarget webTarget;
 		try {
 			webTarget = client.target(new URI(STREAMS_URL));

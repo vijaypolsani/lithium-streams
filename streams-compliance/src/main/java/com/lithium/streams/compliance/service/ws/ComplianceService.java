@@ -1,7 +1,5 @@
 package com.lithium.streams.compliance.service.ws;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.concurrent.ExecutionException;
@@ -13,9 +11,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.media.sse.EventOutput;
 import org.glassfish.jersey.media.sse.OutboundEvent;
@@ -55,7 +51,7 @@ public class ComplianceService {
 	 * @throws ExecutionException
 	 */
 	@GET
-	@Path("/live")
+	@Path("live")
 	//@Path("live/{communityName}")
 	//@Produces(MediaType.APPLICATION_JSON)
 	@Produces(SseFeature.SERVER_SENT_EVENTS)
@@ -73,11 +69,7 @@ public class ComplianceService {
 	public EventOutput getLiveEvents() throws InterruptedException, ExecutionException {
 
 		//TODO:
-		// Should I have a new Thread for every customer to Kafka? Ideally I want to create a 
-		// new ConsumerGroup for every Customer Login name. I can keep the thread or discard. If I generalize here,
-		// then there could be events missing for this client.... 
-
-		//TODO: Implement Facade pattern here. For a give Community-Check Cache to bring already streaming data
+		// Ideally I want to create a new ConsumerGroup for every Customer Login name. I can keep the thread or discard. 
 
 		log.info(">>> In Compliance Service. ThreadStackTrace: ID: " + Thread.currentThread().getId() + " Name: "
 				+ Thread.currentThread().getName());
@@ -85,8 +77,13 @@ public class ComplianceService {
 		final EventOutput eventOutput = new EventOutput();
 		final OutboundEvent.Builder eventBuilder = new OutboundEvent.Builder();
 		eventBuilder.name("Compliance_Service_SSE_Lia_Events");
-
 		final class StreamEventBusListenerImpl implements StreamEventBusListener {
+			final String listenerName;
+
+			StreamEventBusListenerImpl(String listenerClientName) {
+				this.listenerName = listenerClientName;
+			}
+
 			@Subscribe
 			@AllowConcurrentEvents
 			public void readEvents(ComplianceEvent complianceEvent) {
@@ -94,8 +91,13 @@ public class ComplianceService {
 				eventBuilder.data(String.class, complianceEvent.getEvent());
 				final OutboundEvent event = eventBuilder.build();
 				try {
-					log.info(">>> Inside ConsumerService sending to GUI.");
-					eventOutput.write(event);
+					if (!eventOutput.isClosed()) {
+						log.info(">>> ConsumerService sending Events to Client: " + listenerName);
+						eventOutput.write(event);
+						streamEventBus.unRegisterSubscriber(this);
+					} else {
+						log.info(">>> ConsumerService Closed. Terminiating events to Client: " + listenerName);
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
 					log.error("Exception in writing to SSE object eventOutput." + e.getLocalizedMessage());
@@ -103,7 +105,8 @@ public class ComplianceService {
 				}
 			}
 		}
-		streamEventBus.registerSubscriber(new StreamEventBusListenerImpl());
+		streamEventBus.registerSubscriber(new StreamEventBusListenerImpl("ThreadID: " + Thread.currentThread().getId()
+				+ " ThreadName: " + Thread.currentThread().getName()));
 		consumeEventsService.consumeEvents(COMMUNITY_NAME, LOGIN);
 		//consumeEventsService.consumeEvents(communityName, login);
 		return eventOutput;
