@@ -91,16 +91,12 @@ public class ComplianceService {
 				eventBuilder.data(String.class, complianceEvent.getEvent());
 				final OutboundEvent event = eventBuilder.build();
 				try {
-					if (!eventOutput.isClosed()) {
-						log.info(">>> ConsumerService sending Events to Client: " + listenerName);
-						eventOutput.write(event);
-						streamEventBus.unRegisterSubscriber(this);
-					} else {
-						log.info(">>> ConsumerService Closed. Terminiating events to Client: " + listenerName);
-					}
+					log.info(">>> ConsumerService sending Events to Client: " + listenerName);
+					eventOutput.write(event);
 				} catch (IOException e) {
 					e.printStackTrace();
 					log.error("Exception in writing to SSE object eventOutput." + e.getLocalizedMessage());
+					streamEventBus.unRegisterSubscriber(this);
 					throw new ComplianceServiceException("LI001", "Exception in writing to SSE object eventOutput.", e);
 				}
 			}

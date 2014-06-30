@@ -96,7 +96,11 @@ public class ActivityStreamsClient extends UI {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				access(labelUpdateRunnable);
+				try {
+					access(labelUpdateRunnable);
+				} catch (com.vaadin.ui.UIDetachedException ui) {
+					log.error("<<< Exception in closing UI. Check Vaadin latest version. " + ui.getLocalizedMessage());
+				}
 			}
 		}
 
