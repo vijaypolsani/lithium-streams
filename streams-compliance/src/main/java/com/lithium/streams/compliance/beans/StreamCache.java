@@ -21,12 +21,12 @@ public class StreamCache {
 	private Cache<String, ConsumeMessages> cache = null;
 
 	public StreamCache(ConsumerGroupRemovalListener listener) {
-		cache = CacheBuilder.newBuilder().maximumSize(1000).expireAfterAccess(30, TimeUnit.MINUTES).removalListener(
+		cache = CacheBuilder.newBuilder().maximumSize(1000).expireAfterAccess(30, TimeUnit.DAYS).removalListener(
 				listener).build();
 	}
 
 	public StreamCache() {
-		cache = CacheBuilder.newBuilder().maximumSize(1000).expireAfterAccess(30, TimeUnit.MINUTES).build();
+		cache = CacheBuilder.newBuilder().maximumSize(1000).expireAfterAccess(30, TimeUnit.DAYS).build();
 	}
 
 	public Cache<String, ConsumeMessages> getCache() {

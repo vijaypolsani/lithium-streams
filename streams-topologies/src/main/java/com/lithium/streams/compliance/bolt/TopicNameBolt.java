@@ -20,7 +20,9 @@ import com.lithium.streams.compliance.service.impl.FilteringServiceImpl;
 
 public class TopicNameBolt extends BaseRichBolt {
 	private static final long serialVersionUID = -13585387950438323L;
-	private static final String INPUT_FIELD_DATA = "kafkaTxEvent";
+	// Commenting since we dont do TX Now.
+	//private static final String INPUT_FIELD_DATA = "kafkaTxEvent";
+	private static final String INPUT_FIELD = "kafkaEvent";
 	private static final String OUTPUT_FIELD_DATA = "kafkaCommunityEvent";
 	private static final String OUTPUT_FIELD_DEST = "topicName";
 	private static final Logger log = LoggerFactory.getLogger(TopicNameBolt.class);
@@ -39,15 +41,18 @@ public class TopicNameBolt extends BaseRichBolt {
 
 	@Override
 	public void execute(Tuple input) {
-		String incomingEvent = input.getStringByField(INPUT_FIELD_DATA);
-		try {
-			String topicName = filteringService.parseIncomingsJsonStreamForCommunityId(incomingEvent);
-			boltOutputCollector.emit(new Values(incomingEvent, topicName));
-			log.info(">>> Found the Topic from Event : " + topicName);
-			boltOutputCollector.ack(input);
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new TransformationException("Unable to Find Topic Name 'Source:' tag from the Kafka Event.", e);
+		String kafkaCommunityEvent = input.getStringByField(INPUT_FIELD);
+		if (kafkaCommunityEvent != null) {
+			try {
+				String topicName = filteringService.parseIncomingsJsonStreamForCommunityId(kafkaCommunityEvent);
+				boltOutputCollector.emit(new Values(kafkaCommunityEvent, topicName));
+				log.info(">>> %%% Found the Topic from Event: " + topicName);
+				boltOutputCollector.ack(input);
+			} catch (IOException e) {
+				e.printStackTrace();
+				boltOutputCollector.fail(input);
+				throw new TransformationException("Unable to Find Topic Name 'Source:' tag from the Kafka Event.", e);
+			}
 		}
 	}
 

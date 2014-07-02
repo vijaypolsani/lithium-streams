@@ -1,7 +1,7 @@
 package com.lithium.streams.compliance.consumer;
 
 public class Event {
-	private String jsonContent;
+	private String jsonContent = null;
 
 	/**
 	 * @return the jsonContent

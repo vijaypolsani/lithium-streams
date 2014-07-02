@@ -57,13 +57,15 @@ public class MinimalServer {
 		//Set the package where the services reside
 		rsServletHolder.setInitParameter("jersey.config.server.provider.packages", "org.streams.compliance.service");
 		resourceConfig.packages(ComplianceService.class.getPackage().getName());
-		resourceConfig.register(JacksonFeature.class);
 
 		resourceConfig.register(com.lithium.streams.compliance.beans.StreamEventBus.class);
 		resourceConfig.register(com.lithium.streams.compliance.beans.StreamCache.class);
 		resourceConfig.register(com.lithium.streams.compliance.beans.ConsumeEventsService.class);
-		//resourceConfig.register(ConsumeMessages.class);
+		resourceConfig.register(JacksonFeature.class);
+
+		//Note: The 'ComplianceService' registration will stop many thread creation on Kafka.
 		resourceConfig.register(ComplianceService.class);
+		resourceConfig.register(ConsumeMessages.class);
 
 		ServletContainer servletContainer = new ServletContainer(resourceConfig);
 		ServletHolder sh = new ServletHolder(servletContainer);
@@ -90,16 +92,12 @@ public class MinimalServer {
 		context.addServlet(new ServletHolder(new DumpServlet()), "/dump/*");
 		context.addServlet(new ServletHolder(new ComplianceStreamingServlet()), "/real/*");
 		context.addServlet(new ServletHolder(new ComplainceBatchServlet()), "/batch/*");
-		//context.addServlet(new ServletHolder(new MetricsServlet()), "/metrics/*");
-		//context.addServlet(new ServletHolder(new HealthCheckServlet()), "/health/*");
-		//context.addServlet(new ServletHolder(new PingServlet()), "/ping/*");
-		//context.addServlet(new ServletHolder(new ThreadDumpServlet()), "/tdump/*");
 
 		PropertyConfigurator.configure("./log4j.properties");
 
 		Server server = new Server(threadPool);
-		//Server server = new Server();
 		server.addBean(new MBeanContainer(ManagementFactory.getPlatformMBeanServer()));
+
 		ConnectorStatistics.addToAllConnectors(server);
 
 		HttpConfiguration http_config = new HttpConfiguration();

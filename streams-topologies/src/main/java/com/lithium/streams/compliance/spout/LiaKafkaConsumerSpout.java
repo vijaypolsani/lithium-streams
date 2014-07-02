@@ -11,21 +11,20 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.IRichSpout;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
-import backtype.storm.tuple.Values;
 
-import com.lithium.streams.compliance.exception.ComplianceMessageConsumerException;
 import com.lithium.streams.compliance.service.KafkaConsumerGroup;
 
 public class LiaKafkaConsumerSpout implements IRichSpout {
 
 	private static final long serialVersionUID = -7738897064142088285L;
 	private static final String LIA_STORM_KAFKA_CONSUMER = "Lia-Storm-Kafka-Consumer-Spout";
+	//private static final String KAFKA_LOCALHOST_BROKER_URL = "localhost:9092";
 	private static final String ZOOKEEPER_HOST_URL = "10.240.163.94:2181";
 	private static final String ZOOKEEPER_CONNECTION_TIMEOUT = "5000";
 	private static final String OUTPUT_FIELD = "kafkaEvent";
 
 	private KafkaConsumerGroup consumerGroup = null;
-	private SpoutOutputCollector spoutOutputCollector = null;
+	private SpoutOutputCollector collector = null;
 	private TopologyContext topologyContext = null;
 	private Map config = null;
 
@@ -38,59 +37,56 @@ public class LiaKafkaConsumerSpout implements IRichSpout {
 	@Override
 	public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
 		try {
-			consumerGroup = new KafkaConsumerGroup(ZOOKEEPER_HOST_URL, LIA_STORM_KAFKA_CONSUMER,
-					ZOOKEEPER_CONNECTION_TIMEOUT);
+			if (consumerGroup == null)
+				consumerGroup = new KafkaConsumerGroup(ZOOKEEPER_HOST_URL, LIA_STORM_KAFKA_CONSUMER,
+						ZOOKEEPER_CONNECTION_TIMEOUT, collector);
 		} catch (InterruptedException | ExecutionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		this.spoutOutputCollector = collector;
+		this.collector = collector;
 		this.topologyContext = context;
-		this.config = config;
 	}
 
 	@Override
 	public void close() {
+		consumerGroup.shutdown();
 	}
 
 	@Override
 	public void activate() {
+		if (consumerGroup == null)
+			try {
+				consumerGroup = new KafkaConsumerGroup(ZOOKEEPER_HOST_URL, LIA_STORM_KAFKA_CONSUMER,
+						ZOOKEEPER_CONNECTION_TIMEOUT, collector);
+			} catch (InterruptedException | ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	}
 
 	@Override
 	public void deactivate() {
+		consumerGroup.shutdown();
 	}
 
 	@Override
 	public void nextTuple() {
+		//Sleep for 1 sec to give other threads a breather.
 		try {
-			synchronized (consumerGroup.getLock()) {
-				String data = consumerGroup.getLock().getJsonContent();
-				log.info(">>> Spout reading next data from the ConsumerGroup: " + data);
-				if (data != null)
-					spoutOutputCollector.emit(new Values(data));
-				try {
-					consumerGroup.getLock().wait();
-				} catch (InterruptedException e) {
-					log.info("<<< In ConsumerGroup: Interrupted Message");
-					e.printStackTrace();
-				}
-			}
-		} catch (Exception e) {
-			throw new ComplianceMessageConsumerException("<<< Spout unable to retrieve message from Kafka. ", e);
+			Thread.sleep(1000);
+		} catch (InterruptedException ie) {
+			ie.getLocalizedMessage();
 		}
 	}
 
 	@Override
 	public void ack(Object msgId) {
-		// TODO Auto-generated method stub
-
+		log.info(">>> KafkaSpout: In Ack. Completed Processing " + msgId);
 	}
 
 	@Override
 	public void fail(Object msgId) {
-		// TODO Auto-generated method stub
-
+		log.info("<<< ??? KafkaSpout: In fail. Failed Processing " + msgId);
 	}
 
 	@Override
@@ -102,5 +98,4 @@ public class LiaKafkaConsumerSpout implements IRichSpout {
 	public Map<String, Object> getComponentConfiguration() {
 		return null;
 	}
-
 }

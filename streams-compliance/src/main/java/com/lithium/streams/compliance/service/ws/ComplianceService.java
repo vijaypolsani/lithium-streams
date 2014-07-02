@@ -7,11 +7,14 @@ import java.util.concurrent.ExecutionException;
 import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.media.sse.EventOutput;
 import org.glassfish.jersey.media.sse.OutboundEvent;
@@ -27,15 +30,21 @@ import com.google.common.eventbus.Subscribe;
 import com.lithium.streams.compliance.beans.ConsumeEventsService;
 import com.lithium.streams.compliance.beans.StreamEventBus;
 import com.lithium.streams.compliance.exception.ComplianceServiceException;
+import com.lithium.streams.compliance.exception.NotAuthorizedException;
 import com.lithium.streams.compliance.model.ComplianceEvent;
 import com.lithium.streams.compliance.util.StreamEventBusListener;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkArgument;
 
 @Path("/v1")
 public class ComplianceService {
 
 	private static final Logger log = LoggerFactory.getLogger(ComplianceService.class);
-	private static final String COMMUNITY_NAME = "actiance.qa";
-	private static final String LOGIN = "demo";
+	//private static final String COMMUNITY_NAME = "actiance";
+	private static final String COMMUNITY_NAME = "actiance.stage";
+	private static final String LOGIN = "-user";
+	private static final String PASSCODE = "sCe9KITKh8+h1w4e9EDnVwzXBM8NjiilrWS6dOdMNr0=";
 
 	@Inject
 	private ConsumeEventsService consumeEventsService;
@@ -58,21 +67,18 @@ public class ComplianceService {
 	@Timed
 	@Metered
 	@ExceptionMetered
-	/*
-	public EventOutput getLiveEvents(@PathParam("communityName") String communityName,
-			@DefaultValue("demo") @QueryParam("login") String login) throws InterruptedException, ExecutionException {
-
-		checkNotNull(login, new WebApplicationException("Login Parameter Cannot be NULL", Response.Status.BAD_REQUEST));
-		checkNotNull(communityName, new WebApplicationException("CommunityName Cannot be NULL",
-				Response.Status.BAD_REQUEST));
-	*/
-	public EventOutput getLiveEvents() throws InterruptedException, ExecutionException {
+	public EventOutput getLiveEvents(@HeaderParam("client-id") String clientId) throws InterruptedException,
+			ExecutionException {
 
 		//TODO:
 		// Ideally I want to create a new ConsumerGroup for every Customer Login name. I can keep the thread or discard. 
 
-		log.info(">>> In Compliance Service. ThreadStackTrace: ID: " + Thread.currentThread().getId() + " Name: "
-				+ Thread.currentThread().getName());
+		log.info(">>> In Compliance Service. Header client-id: " + clientId);
+		if (clientId == null || !(clientId.equals(PASSCODE))) {
+			log.info("Missing Header 'client-id' OR Invalid Passcode for header client-id: " + clientId);
+			throw new NotAuthorizedException(
+					"Unauthorized Request: Missing Header 'client-id' OR Invalid Passcode for header.");
+		}
 
 		final EventOutput eventOutput = new EventOutput();
 		final OutboundEvent.Builder eventBuilder = new OutboundEvent.Builder();
@@ -91,20 +97,24 @@ public class ComplianceService {
 				eventBuilder.data(String.class, complianceEvent.getEvent());
 				final OutboundEvent event = eventBuilder.build();
 				try {
-					log.info(">>> ConsumerService sending Events to Client: " + listenerName);
-					eventOutput.write(event);
+					if (eventOutput != null) {
+						log.info(">>> ConsumerService sending Events to Client: " + listenerName);
+						eventOutput.write(event);
+					} else
+						log.error("--- ConsumerService sending Events closed Null: " + listenerName);
+
 				} catch (IOException e) {
 					e.printStackTrace();
-					log.error("Exception in writing to SSE object eventOutput." + e.getLocalizedMessage());
-					streamEventBus.unRegisterSubscriber(this);
-					throw new ComplianceServiceException("LI001", "Exception in writing to SSE object eventOutput.", e);
+					//streamEventBus.unRegisterSubscriber(this);
+					log.error("Exception in writing to SSE object eventOutput. Removed Client Listener. "
+							+ listenerName + " Exception: " + e.getLocalizedMessage());
+					//throw new ComplianceServiceException("LI001", "Exception in writing to SSE object eventOutput.", e);
 				}
 			}
 		}
 		streamEventBus.registerSubscriber(new StreamEventBusListenerImpl("ThreadID: " + Thread.currentThread().getId()
 				+ " ThreadName: " + Thread.currentThread().getName()));
 		consumeEventsService.consumeEvents(COMMUNITY_NAME, LOGIN);
-		//consumeEventsService.consumeEvents(communityName, login);
 		return eventOutput;
 	}
 

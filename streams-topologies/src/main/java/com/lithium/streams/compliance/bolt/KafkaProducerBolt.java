@@ -22,7 +22,7 @@ public class KafkaProducerBolt extends BaseRichBolt {
 	private static final String INTPUT_FIELD_DATA = "kafkaCommunityEvent";
 	private static final String INTPUT_FIELD_DEST = "topicName";
 	private static final String KAFKA_AWS_BROKER_URL = "10.240.163.94:9092";
-	private static final String KAFKA_LOCALHOST_BROKER_URL = "localhost:9092";
+	//private static final String KAFKA_LOCALHOST_BROKER_URL = "localhost:9092";
 
 	private static final Logger log = LoggerFactory.getLogger(KafkaProducerBolt.class);
 	private static kafka.javaapi.producer.Producer<Integer, String> producer = null;
@@ -39,20 +39,25 @@ public class KafkaProducerBolt extends BaseRichBolt {
 		//props.put("metadata.broker.list", KAFKA_LOCALHOST_BROKER_URL); 
 		props.put("metadata.broker.list", KAFKA_AWS_BROKER_URL); //AWS Instance
 		props.put("serializer.class", "kafka.serializer.StringEncoder");
-		producer = new kafka.javaapi.producer.Producer<Integer, String>(new ProducerConfig(props));
+		if (producer == null)
+			producer = new kafka.javaapi.producer.Producer<Integer, String>(new ProducerConfig(props));
 	}
 
 	@Override
 	public void execute(Tuple input) {
 		String incomingData = input.getStringByField(INTPUT_FIELD_DATA);
 		String topicName = input.getStringByField(INTPUT_FIELD_DEST);
-		try {
-			producer.send(new KeyedMessage<Integer, String>(topicName, incomingData));
-			boltOutputCollector.ack(input);
-			log.info(">>> Sent to KAFKA: to Topic: " + topicName + " with data " + incomingData);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new ComplianceMessageSendException("Could not send Kafka event to topic: " + topicName, e);
+		if (incomingData != null && topicName != null) {
+			try {
+				producer.send(new KeyedMessage<Integer, String>(topicName, incomingData));
+				//log.info(">>> **** Sent to KAFKA: to Topic: **** " + topicName + " with data " + incomingData);
+				log.info(">>> $$$ Sent to KAFKA: to Topic: **** " + topicName);
+				boltOutputCollector.ack(input);
+			} catch (Exception e) {
+				e.printStackTrace();
+				boltOutputCollector.fail(input);
+				throw new ComplianceMessageSendException("Could not send Kafka event to topic: " + topicName, e);
+			}
 		}
 	}
 

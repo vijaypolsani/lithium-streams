@@ -15,6 +15,8 @@ import kafka.consumer.KafkaStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.lithium.streams.compliance.beans.StreamEventBus;
+
 public class ConsumerGroup {
 	private final kafka.javaapi.consumer.ConsumerConnector consumer;
 
@@ -26,14 +28,16 @@ public class ConsumerGroup {
 	private final String topicName;
 	private final String groupId;
 	private final String zkTimeout;
+	private final StreamEventBus streamEventBus;
 	private static final Logger log = LoggerFactory.getLogger(ConsumerGroup.class);
 
-	public ConsumerGroup(String hostNameUrl, String zkTimeout, String topicName, String groupId)
-			throws InterruptedException, ExecutionException {
+	public ConsumerGroup(String hostNameUrl, String zkTimeout, String topicName, String groupId,
+			StreamEventBus streamEventBus) throws InterruptedException, ExecutionException {
 		this.hostNameUrl = hostNameUrl;
 		this.zkTimeout = zkTimeout;
 		this.topicName = topicName;
 		this.groupId = groupId;
+		this.streamEventBus = streamEventBus;
 		consumer = kafka.consumer.Consumer.createJavaConsumerConnector(createConsumerConfig());
 		createThreadPool();
 	}
@@ -65,7 +69,7 @@ public class ConsumerGroup {
 		for (KafkaStream<byte[], byte[]> stream : streams) {
 			lock = new Event();
 			log.info(">>> Calling ThreadNumber : " + threadNumber);
-			consumerCallable = new ConsumerCallable(stream, threadNumber, lock);
+			consumerCallable = new ConsumerCallable(stream, threadNumber, lock, streamEventBus);
 			//Works good only for 1 thread pool. Check this later after DEMO
 			executor.submit(consumerCallable);
 			threadNumber++;
@@ -83,7 +87,7 @@ public class ConsumerGroup {
 	public static void main(String[] args) {
 
 		try {
-			ConsumerGroup consumerGroup = new ConsumerGroup("10.240.163.94:2181", "LiaConsumer", "5000", "lia");
+			ConsumerGroup consumerGroup = new ConsumerGroup("10.240.163.94:2181", "LiaConsumer", "5000", "lia", null);
 			while (true) {
 				synchronized (consumerGroup.lock) {
 					log.info(">>> In ConsumerGroup: " + consumerGroup.lock.getJsonContent());

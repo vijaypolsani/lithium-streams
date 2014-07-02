@@ -22,33 +22,33 @@ public class ConsumeMessages extends Thread {
 	public ConsumeMessages(String threadName, String hostNameUrl, final String zkTimeout, String topicName,
 			String groupId, StreamEventBus streamEventBus) throws InterruptedException, ExecutionException {
 		super(threadName);
-		consumerGroup = new ConsumerGroup(hostNameUrl, zkTimeout, topicName, groupId);
+		consumerGroup = new ConsumerGroup(hostNameUrl, zkTimeout, topicName, groupId, streamEventBus);
 		this.streamEventBus = streamEventBus;
 	}
 
 	public void run() {
+		long counter = 0L;
 		log.info(">>> Created ConsumeMessages thread for reading data from Kafka.");
-		try {
-			while (true) {
-				//TODO: Hide the low level Thread Sync details after Performance. Remove STR and get Direct JSON Content
-				synchronized (consumerGroup.getLock()) {
-					String str = consumerGroup.getLock().getJsonContent();
-					log.info(">>> In ConsumeMessages Thread. Reading content : " + str);
-					if (str != null) {
-						log.info(">>> Inside ConsumeMessages sleeping for 1sec. ");
-						Thread.sleep(1000);
-						try {
-							streamEventBus.postEvent(new LiaPostEvent(str));
-						} catch (ComplianceServiceException cs) {
-							throw new ComplianceServiceException("LI002", "Unregistred the listener. Reregister.", cs);
-						}
+		while (true) {
+			//TODO: Hide the low level Thread Sync details after Performance. Remove STR and get Direct JSON Content
+			synchronized (consumerGroup.getLock()) {
+				log.info(">>> ConsumeMessages Handler Thread. *CC = " + counter++ + " * Data: "
+						+ consumerGroup.getLock().getJsonContent());
+				if (consumerGroup.getLock().getJsonContent() != null) {
+					try {
+						streamEventBus.postEvent(new LiaPostEvent(consumerGroup.getLock().getJsonContent()));
+					} catch (ComplianceServiceException cs) {
+						throw new ComplianceServiceException("LI002", "Unregistred the listener. Reregister.", cs);
 					}
+					consumerGroup.getLock().notifyAll();
+				}
+				try {
+					log.info(">>> In Wait ConsumeMessages.");
 					consumerGroup.getLock().wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
 	}
