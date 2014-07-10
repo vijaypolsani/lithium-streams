@@ -23,19 +23,14 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.web.context.ContextLoaderListener;
 
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.health.HealthCheckRegistry;
 import com.codahale.metrics.servlets.AdminServlet;
-import com.lithium.streams.compliance.beans.StreamCache;
-import com.lithium.streams.compliance.consumer.ConsumeMessages;
-import com.lithium.streams.compliance.service.ws.ComplianceService;
+import com.lithium.streams.compliance.service.ws.ComplianceBatchService;
+import com.lithium.streams.compliance.service.ws.ComplianceClientStateService;
 import com.lithium.streams.compliance.util.DumpServlet;
-import com.lithium.streams.compliance.util.ListOfSpringBeans;
 
 public class MinimalServer {
 
@@ -56,16 +51,14 @@ public class MinimalServer {
 
 		//Set the package where the services reside
 		rsServletHolder.setInitParameter("jersey.config.server.provider.packages", "org.streams.compliance.service");
-		resourceConfig.packages(ComplianceService.class.getPackage().getName());
+		resourceConfig.packages(ComplianceBatchService.class.getPackage().getName());
 
-		resourceConfig.register(com.lithium.streams.compliance.beans.StreamEventBus.class);
 		resourceConfig.register(com.lithium.streams.compliance.beans.StreamCache.class);
-		resourceConfig.register(com.lithium.streams.compliance.beans.ConsumeEventsService.class);
 		resourceConfig.register(JacksonFeature.class);
 
 		//Note: The 'ComplianceService' registration will stop many thread creation on Kafka.
-		resourceConfig.register(ComplianceService.class);
-		resourceConfig.register(ConsumeMessages.class);
+		resourceConfig.register(ComplianceBatchService.class);
+		resourceConfig.register(ComplianceClientStateService.class);
 
 		ServletContainer servletContainer = new ServletContainer(resourceConfig);
 		ServletHolder sh = new ServletHolder(servletContainer);
@@ -117,7 +110,7 @@ public class MinimalServer {
 
 	private static ServerConnector setHttpConfiguration(Server server, HttpConfiguration http_config) {
 		ServerConnector serverConnector = new ServerConnector(server, new HttpConnectionFactory(http_config));
-		serverConnector.setPort(6060);
+		serverConnector.setPort(7070);
 		serverConnector.setIdleTimeout(108000);
 		return serverConnector;
 	}
@@ -133,7 +126,7 @@ public class MinimalServer {
 		https_config.addCustomizer(new SecureRequestCustomizer());
 		ServerConnector serverConnector = new ServerConnector(server, new SslConnectionFactory(sslContextFactory,
 				"http/1.1"), new HttpConnectionFactory(https_config));
-		serverConnector.setPort(6443);
+		serverConnector.setPort(7443);
 		serverConnector.setIdleTimeout(108000);
 		return serverConnector;
 	}

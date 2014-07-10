@@ -25,6 +25,7 @@
 	</repositories>
 	<modules>
     <module>streams-compliance</module>
+    <module>streams-compliance-batch</module>
     <module>streams-topologies</module>
     <module>streams-vaadin-client</module>
 	</modules>
