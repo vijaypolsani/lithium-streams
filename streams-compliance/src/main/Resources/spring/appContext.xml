@@ -20,6 +20,8 @@
 	</bean>
 	<bean id="consumeEventsService" class="com.lithium.streams.compliance.beans.ConsumeEventsServiceImpl" autowire="constructor"
 		autowire-candidate="true">
+		<constructor-arg value="${hosturl}" />
+		<constructor-arg value="${zkTimeout}" />
 	</bean>
 
 </beans>

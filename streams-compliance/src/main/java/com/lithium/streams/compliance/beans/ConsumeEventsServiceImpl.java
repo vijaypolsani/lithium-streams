@@ -16,8 +16,10 @@ import com.lithium.streams.compliance.consumer.ConsumeMessages;
 import com.lithium.streams.compliance.util.StreamEventBusListener;
 
 public class ConsumeEventsServiceImpl implements ConsumeEventsService {
-	private static final String ZK_HOSTNAME_URL = "10.240.163.94:2181";
-	private static final String ZK_TIMEOUT = "5000";
+	//private static final String ZK_HOSTNAME_URL = "10.240.163.94:2181";
+	//private static final String ZK_TIMEOUT = "5000";
+	private final String ZK_HOSTNAME_URL;
+	private final String ZK_TIMEOUT;
 	private static final Logger log = LoggerFactory.getLogger(ConsumeEventsServiceImpl.class);
 
 	@Inject
@@ -29,7 +31,9 @@ public class ConsumeEventsServiceImpl implements ConsumeEventsService {
 	private ConsumeMessages consumeMessages = null;
 
 	// Use this Service to WRAP the access to the Kafka Consumer Threads
-	public ConsumeEventsServiceImpl() {
+	public ConsumeEventsServiceImpl(String hostUrl, String zkTimeout) {
+		this.ZK_HOSTNAME_URL = hostUrl;
+		this.ZK_TIMEOUT = zkTimeout;
 	}
 
 	@Override
@@ -42,7 +46,8 @@ public class ConsumeEventsServiceImpl implements ConsumeEventsService {
 		consumeMessages = streamCache.getCache().getIfPresent(groupId);
 		if (consumeMessages == null) {
 			log.info(">>> No Cache Thread *NOT FOUND* for GroupID: " + groupId);
-			consumeMessages = new ConsumeMessages(groupId, ZK_HOSTNAME_URL, ZK_TIMEOUT, communityName, groupId, streamEventBus);
+			consumeMessages = new ConsumeMessages(groupId, ZK_HOSTNAME_URL, ZK_TIMEOUT, communityName, groupId,
+					streamEventBus);
 			consumeMessages.start();
 			streamCache.getCache().put(groupId, consumeMessages);
 		}
