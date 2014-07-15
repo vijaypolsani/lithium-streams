@@ -19,7 +19,10 @@ public class LiaKafkaConsumerSpout implements IRichSpout {
 	private static final long serialVersionUID = -7738897064142088285L;
 	private static final String LIA_STORM_KAFKA_CONSUMER = "Lia-Storm-Kafka-Consumer-Spout";
 	//private static final String KAFKA_LOCALHOST_BROKER_URL = "localhost:9092";
-	private static final String ZOOKEEPER_HOST_URL = "10.240.163.94:2181";
+	//DEV
+	//private static final String ZOOKEEPER_HOST_URL = "10.240.163.94:2181";
+	//PROD
+	private static final String ZOOKEEPER_HOST_URL = "10.220.186.232:2181";
 	private static final String ZOOKEEPER_CONNECTION_TIMEOUT = "5000";
 	private static final String OUTPUT_FIELD = "kafkaEvent";
 

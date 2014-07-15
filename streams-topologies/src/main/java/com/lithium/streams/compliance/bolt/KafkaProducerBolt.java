@@ -21,8 +21,10 @@ public class KafkaProducerBolt extends BaseRichBolt {
 	private static final long serialVersionUID = -13585387950438323L;
 	private static final String INTPUT_FIELD_DATA = "kafkaCommunityEvent";
 	private static final String INTPUT_FIELD_DEST = "topicName";
-	private static final String KAFKA_AWS_BROKER_URL = "10.240.163.94:9092";
-	//private static final String KAFKA_LOCALHOST_BROKER_URL = "localhost:9092";
+	//PROD
+	private static final String KAFKA_AWS_BROKER_URL = "10.220.186.232:9092";
+	//DEV
+	//private static final String KAFKA_AWS_BROKER_URL = "10.240.163.94:9092";
 
 	private static final Logger log = LoggerFactory.getLogger(KafkaProducerBolt.class);
 	private static kafka.javaapi.producer.Producer<Integer, String> producer = null;
