@@ -10,9 +10,15 @@ import kafka.javaapi.consumer.SimpleConsumer;
 
 import com.lithium.streams.compliance.api.AbstractComplianceBatchService;
 import com.lithium.streams.compliance.api.ClusterKafkaLowLevelApi;
+import com.lithium.streams.compliance.consumer.KafkaSimpleConsumerFactory;
 import com.lithium.streams.compliance.model.ComplianceMessage;
 
 public class ComplianceBatchCluster extends AbstractComplianceBatchService implements ClusterKafkaLowLevelApi {
+
+	public ComplianceBatchCluster(KafkaSimpleConsumerFactory kafkaSimpleConsumerFactory) {
+		super(kafkaSimpleConsumerFactory);
+		// TODO Auto-generated constructor stub
+	}
 
 	@Override
 	public long getLatestOffsetOfTopic(String topicName) throws Exception {

@@ -8,8 +8,8 @@ public class KafkaSimpleConsumerFactory {
 	private final SimpleConsumerPool simpleConsumerPool;
 
 	public KafkaSimpleConsumerFactory() {
-		genericObjectPoolConfig.setMaxIdle(1);
-		genericObjectPoolConfig.setMaxTotal(1);
+		genericObjectPoolConfig.setMaxIdle(10);
+		genericObjectPoolConfig.setMaxTotal(10);
 		genericObjectPoolConfig.setTestOnBorrow(true);
 		genericObjectPoolConfig.setTestOnReturn(true);
 		simpleConsumerPool = new SimpleConsumerPool(new SimpleConsumerFactory(), genericObjectPoolConfig);

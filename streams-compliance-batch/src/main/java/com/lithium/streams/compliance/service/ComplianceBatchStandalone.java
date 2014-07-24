@@ -6,10 +6,12 @@ import javax.ws.rs.core.Response;
 
 import com.lithium.streams.compliance.api.AbstractComplianceBatchService;
 import com.lithium.streams.compliance.api.ComplianceBatchEvents;
+import com.lithium.streams.compliance.consumer.KafkaSimpleConsumerFactory;
 
 public class ComplianceBatchStandalone extends AbstractComplianceBatchService implements ComplianceBatchEvents {
 
-	public ComplianceBatchStandalone() {
+	public ComplianceBatchStandalone(KafkaSimpleConsumerFactory kafkaSimpleConsumerFactory) {
+		super(kafkaSimpleConsumerFactory);
 	}
 
 	@Override

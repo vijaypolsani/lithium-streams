@@ -28,7 +28,7 @@ public class TestKafkaConsumer {
 	private static final String TOPIC_NAME = "lia";
 	private static final String TOPIC_NAME_ACTIANCE = "actiance.stage";
 	private static final SimpleConsumer simpleConsumer = new SimpleConsumer("10.240.163.94", 9092, 100000, 64 * 1024,
-			"DemoPocConsumer");;
+			"junit");;
 
 	@Autowired
 	private ComplianceBatchStandalone complianceBatchStandalone;
@@ -74,7 +74,7 @@ public class TestKafkaConsumer {
 	@Test
 	public void getEarliestOffset() throws Exception {
 		//kafka.api.OffsetRequest.EarliestTime()
-		long offset = complianceBatchStandalone.getLatestOffsetOfTopic(TOPIC_NAME);
+		long offset = complianceBatchStandalone.getEarliestOffsetOfTopic(TOPIC_NAME);
 		System.out.println(" EarliestOffset offset: " + offset);
 		Assert.notNull(offset);
 	}

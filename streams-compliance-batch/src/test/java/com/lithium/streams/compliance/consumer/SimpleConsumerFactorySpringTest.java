@@ -71,7 +71,7 @@ public class SimpleConsumerFactorySpringTest {
 					+ simpleConsumerPool.getBorrowedCount() + "]");
 			Assert.assertEquals(limit, counter.get());
 			Assert.assertEquals(counter.get(), simpleConsumerPool.getBorrowedCount());
-			Assert.assertEquals(1, simpleConsumerPool.getCreatedCount());
+			Assert.assertEquals(10, simpleConsumerPool.getCreatedCount());
 		} catch (Exception ex) {
 
 		}

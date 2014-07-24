@@ -36,18 +36,12 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 
 	private static final List<String> topicList = new ArrayList<String>();
 	private final TopicMetadataRequest topicMetaDataReqeuest;
-	private  SimpleConsumerPool simpleConsumerPool;
+	private final SimpleConsumerPool simpleConsumerPool;
 
-	@Autowired
-	private KafkaSimpleConsumerFactory kafkaSimpleConsumerFactory;
+	protected static KafkaSimpleConsumerFactory kafkaSimpleConsumerFactory;
 
 	@Autowired
 	private ComplainceHandlerProcessor complainceHandlerProcessor;
-
-	public AbstractComplianceBatchService() {
-		topicList.add(EnumKafkaProperties.TOPIC_ACTIANCE.getKafkaProperties());
-		topicMetaDataReqeuest = new kafka.javaapi.TopicMetadataRequest(topicList);
-	}
 
 	public AbstractComplianceBatchService(KafkaSimpleConsumerFactory kafkaSimpleConsumerFactory) {
 		topicList.add(EnumKafkaProperties.TOPIC_ACTIANCE.getKafkaProperties());
@@ -206,4 +200,13 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 		simpleConsumerPool.returnObject(consumer);
 		return fetchResponse;
 	}
+
+	public static KafkaSimpleConsumerFactory getKafkaSimpleConsumerFactory() {
+		return kafkaSimpleConsumerFactory;
+	}
+
+	public static void setKafkaSimpleConsumerFactory(KafkaSimpleConsumerFactory kafkaSimpleConsumerFactory) {
+		AbstractComplianceBatchService.kafkaSimpleConsumerFactory = kafkaSimpleConsumerFactory;
+	}
+
 }
