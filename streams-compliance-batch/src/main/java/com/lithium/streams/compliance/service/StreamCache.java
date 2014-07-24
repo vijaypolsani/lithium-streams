@@ -1,4 +1,4 @@
-package com.lithium.streams.compliance.beans;
+package com.lithium.streams.compliance.service;
 
 import java.util.concurrent.TimeUnit;
 
