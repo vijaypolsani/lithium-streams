@@ -1,17 +1,16 @@
 package com.lithium.streams.compliance.service.ws;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.math.BigInteger;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 
-import javax.ws.rs.DefaultValue;
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
@@ -19,47 +18,71 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
-import kafka.javaapi.TopicMetadataRequest;
-import kafka.javaapi.TopicMetadataResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.codahale.metrics.annotation.ExceptionMetered;
 import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
-import com.lithium.streams.compliance.api.ComplianceBatchEvents;
 import com.lithium.streams.compliance.model.ComplianceMessage;
+import com.lithium.streams.compliance.service.ComplianceBatchStandalone;
 
 @Path("/v1")
-public class ComplianceBatchService  {
+public class ComplianceBatchService {
 
 	private static final Logger log = LoggerFactory.getLogger(ComplianceBatchService.class);
-	private static final String COMMUNITY_NAME = "actiance";
+	private static final String COMMUNITY_NAME = "lia";
 	//private static final String COMMUNITY_NAME = "actiance.stage";
 	private static final String LOGIN = "-user";
 	private static final String PASSCODE = "sCe9KITKh8+h1w4e9EDnVwzXBM8NjiilrWS6dOdMNr0=";
+
+	@Inject
+	private ComplianceBatchStandalone complianceBatchStandalone;
 
 	/* (non-Javadoc)
 	 * @see com.lithium.streams.compliance.service.ws.ComplianceBatch#getBatchLatestSequenceId(java.lang.String, java.math.BigInteger, java.math.BigInteger)
 	 */
 	@GET
 	@Path("id")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_OCTET_STREAM)
 	@Timed
 	@Metered
 	@ExceptionMetered
 	public Response getBatchLatestSequenceId(@HeaderParam("client-id") String clientId,
-			@QueryParam("startId") String startId, @QueryParam("endId") String endId) throws InterruptedException,
+			@QueryParam("start") String start, @QueryParam("end") String end) throws InterruptedException,
 			ExecutionException {
-
-		final StreamingOutput streamingOutput = new StreamingOutput() {
-			@Override
-			public void write(OutputStream output) throws IOException, WebApplicationException {
-
+		log.info(">> BatchLatestSequenceId Jersey Interface Called. " + clientId + " start=" + start + " end=" + end);
+		try {
+			final Collection<ComplianceMessage> messages = complianceBatchStandalone.processStream(COMMUNITY_NAME);
+			System.out.println(">> Data size Retrieved from kafka. " + messages.size());
+			ByteArrayOutputStream bo = new ByteArrayOutputStream();
+			try {
+				final ObjectOutputStream objectOutputStream = new ObjectOutputStream(bo);
+				final StreamingOutput streamingOutput = new StreamingOutput() {
+					@Override
+					public void write(OutputStream output) throws IOException, WebApplicationException {
+						try {
+							for (ComplianceMessage msg : messages) {
+								objectOutputStream.writeObject(msg);
+								output.write(bo.toByteArray());
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						output.flush();
+					}
+				};
+				return Response.ok().entity(streamingOutput).type(MediaType.APPLICATION_OCTET_STREAM).build();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				return Response.serverError().entity(e1.getLocalizedMessage()).type(MediaType.APPLICATION_JSON).build();
 			}
-		};
-		return Response.ok().entity("").type(MediaType.APPLICATION_JSON).build();
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return Response.serverError().entity(e1.getLocalizedMessage()).type(MediaType.APPLICATION_JSON).build();
+		}
 	}
 
 	/* (non-Javadoc)
@@ -81,7 +104,7 @@ public class ComplianceBatchService  {
 
 			}
 		};
-		return Response.ok().entity(streamingOutput).type(MediaType.APPLICATION_JSON).build();
+		return Response.ok().entity(streamingOutput).build();
 	}
 
 }

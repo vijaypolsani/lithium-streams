@@ -1,6 +1,7 @@
 package com.lithium.streams.compliance.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import kafka.javaapi.PartitionMetadata;
@@ -16,6 +17,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
+
+import com.lithium.streams.compliance.model.ComplianceMessage;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:./spring/appContext.xml")
@@ -79,4 +82,14 @@ public class TestKafkaConsumer {
 		Assert.notNull(offset);
 	}
 
+	@Test
+	public void getId() throws Exception {
+		//kafka.api.OffsetRequest.EarliestTime()
+		Collection<ComplianceMessage> messages = complianceBatchStandalone.processStream(TOPIC_NAME);
+		for (ComplianceMessage msg : messages) {
+			System.out.println(" Messages : " + msg.getEventPayload().getJsonMessage());
+
+		}
+		Assert.notNull(messages);
+	}
 }

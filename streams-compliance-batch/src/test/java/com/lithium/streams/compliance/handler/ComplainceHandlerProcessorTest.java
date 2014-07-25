@@ -18,6 +18,6 @@ public class ComplainceHandlerProcessorTest {
 		ComplainceHandlerProcessor complainceHandlerProcessor = new ComplainceHandlerProcessor();
 		complainceHandlerProcessor.printHandlerChain();
 		ComplianceMessage complianceMessage = new ComplianceMessage.MsgBuilder("test").build();
-		Assert.assertNull(complainceHandlerProcessor.processChain(complianceMessage));
+		Assert.assertNotNull(complainceHandlerProcessor.processChain(complianceMessage));
 	}
 }

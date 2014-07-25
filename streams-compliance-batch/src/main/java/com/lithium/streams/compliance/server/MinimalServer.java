@@ -39,7 +39,6 @@ public class MinimalServer {
 	public MinimalServer() {
 		final JmxReporter reporter = JmxReporter.forRegistry(registry).build();
 		reporter.start();
-		PropertyConfigurator.configure("./log4j.properties");
 		 
 	}
 
@@ -52,6 +51,8 @@ public class MinimalServer {
 		serverConnector.setPort(7070);
 		serverConnector.setIdleTimeout(108000);
 		connectors[0] = serverConnector;
+
+		PropertyConfigurator.configure("./log4j.properties");
 
 		sslContextFactory.setKeyStorePath("./keystore.jks");
 		sslContextFactory.setKeyStorePassword("changeme");

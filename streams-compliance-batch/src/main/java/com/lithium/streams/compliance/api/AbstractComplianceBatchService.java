@@ -21,6 +21,8 @@ import kafka.javaapi.TopicMetadataResponse;
 import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.message.MessageAndOffset;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
@@ -34,6 +36,7 @@ import com.lithium.streams.compliance.model.CompliancePayload;
 
 public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi {
 
+	private static final Logger log = LoggerFactory.getLogger(AbstractComplianceBatchService.class);
 	private static final List<String> topicList = new ArrayList<String>();
 	private final TopicMetadataRequest topicMetaDataReqeuest;
 	private final SimpleConsumerPool simpleConsumerPool;
@@ -51,6 +54,7 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 
 	@Override
 	public long getLatestOffsetOfTopic(String topicName) throws Exception {
+		log.info(">>> Calling get Current Offset");
 		TopicAndPartition topicAndPartition = new TopicAndPartition(topicName, Integer
 				.parseInt(EnumKafkaProperties.PARTITION.getKafkaProperties()));
 		Map<TopicAndPartition, PartitionOffsetRequestInfo> requestInfo = new HashMap<TopicAndPartition, PartitionOffsetRequestInfo>();
@@ -70,11 +74,13 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 		long[] offsets = response.offsets(topicName, Integer.parseInt(EnumKafkaProperties.PARTITION
 				.getKafkaProperties()));
 		simpleConsumerPool.returnObject(consumer);
+		log.info(">>> From Kafka Current Offset:" + offsets[0]);
 		return offsets[0];
 	}
 
 	@Override
 	public long getEarliestOffsetOfTopic(String topicName) throws Exception {
+		log.info(">>> Calling get Oldest Offset");
 		TopicAndPartition topicAndPartition = new TopicAndPartition(topicName, Integer
 				.parseInt(EnumKafkaProperties.PARTITION.getKafkaProperties()));
 		Map<TopicAndPartition, PartitionOffsetRequestInfo> requestInfo = new HashMap<TopicAndPartition, PartitionOffsetRequestInfo>();
@@ -94,11 +100,13 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 		long[] offsets = response.offsets(topicName, Integer.parseInt(EnumKafkaProperties.PARTITION
 				.getKafkaProperties()));
 		simpleConsumerPool.returnObject(consumer);
+		log.info(">>> From Kafka Oldest Offset:" + offsets[0]);
 		return offsets[0];
 	}
 
 	@Override
 	public long[] getOffsetsOfTopic(String topicName) throws Exception {
+		log.info(">>> Calling get List of Offset from Topic.");
 		long[] offsets = null;
 		TopicAndPartition topicAndPartition = new TopicAndPartition(topicName, Integer
 				.parseInt(EnumKafkaProperties.PARTITION.getKafkaProperties()));
@@ -118,12 +126,14 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 		}
 		offsets = response.offsets(topicName, Integer.parseInt(EnumKafkaProperties.PARTITION.getKafkaProperties()));
 		simpleConsumerPool.returnObject(consumer);
+		log.info(">>> From Kafka Offsets: " + offsets);
+
 		return offsets;
 	}
 
 	@Override
 	public void commitOffsets() {
-		// TODO Auto-generated method stub
+		log.info("<<< Not implmented Yet.");
 	}
 
 	@Override
@@ -135,9 +145,9 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 		List<TopicMetadata> metaData = topicMetaDataResponse.topicsMetadata();
 		for (TopicMetadata item : metaData) {
 			for (PartitionMetadata part : item.partitionsMetadata()) {
-				System.out.println(" Data from Metadata, leader: " + part.leader().toString());
-				System.out.println(" Data from Metadata, partitionId : " + part.partitionId());
-				System.out.println(" Data from Metadata, replicas: " + part.replicas());
+				log.info(" Data from Metadata, leader: " + part.leader().toString());
+				log.info(" Data from Metadata, partitionId : " + part.partitionId());
+				log.info(" Data from Metadata, replicas: " + part.replicas());
 			}
 		}
 		simpleConsumerPool.returnObject(consumer);
@@ -146,16 +156,15 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 
 	@Override
 	public Collection<ComplianceMessage> processStream(final String topicName) throws Exception {
+		log.info(">>> Process Stream from Kafka for Topic: " + topicName);
 		long readOffset = getEarliestOffsetOfTopic(topicName);
 		List<ComplianceMessage> returnMessages = new ArrayList<>();
-
 		FetchResponse fetchResponse = getFetchResponse(topicName, readOffset);
-
 		for (MessageAndOffset messageAndOffset : fetchResponse.messageSet(topicName, Integer
 				.parseInt(EnumKafkaProperties.PARTITION.getKafkaProperties()))) {
 			long currentOffset = messageAndOffset.offset();
 			if (currentOffset < readOffset) {
-				System.out.println("Found an old offset: " + currentOffset + " Expecting: " + readOffset);
+				log.info("Found an old offset: " + currentOffset + " Expecting: " + readOffset);
 				continue;
 			}
 			readOffset = messageAndOffset.nextOffset();
@@ -164,12 +173,15 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 			byte[] bytes = new byte[payload.limit()];
 			payload.get(bytes);
 			CompliancePayload compliancePayload = new CompliancePayload(new String(bytes, "UTF-8"));
-			System.out.println(String.valueOf(messageAndOffset.offset()) + ": " + new String(bytes, "UTF-8"));
+			log.info(">>> Offset:Data: " + String.valueOf(messageAndOffset.offset()) + ": "
+					+ compliancePayload.getJsonMessage());
 			ComplianceMessage complianceMessage = new ComplianceMessage.MsgBuilder(topicName + ":"
 					+ messageAndOffset.offset()).header(
 					new ComplianceHeader.HeaderBuilder(System.currentTimeMillis()).communityId(topicName).build())
 					.payload(compliancePayload).build();
+			log.info(">>> Calling Processor:" + complainceHandlerProcessor.printHandlerChain());
 			complainceHandlerProcessor.processChain(complianceMessage);
+			log.info(">>> Completed Processor Chain Calls.");
 			returnMessages.add(complianceMessage);
 		}
 		return returnMessages;
@@ -201,12 +213,12 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 		return fetchResponse;
 	}
 
-	public static KafkaSimpleConsumerFactory getKafkaSimpleConsumerFactory() {
-		return kafkaSimpleConsumerFactory;
-	}
-
 	public static void setKafkaSimpleConsumerFactory(KafkaSimpleConsumerFactory kafkaSimpleConsumerFactory) {
 		AbstractComplianceBatchService.kafkaSimpleConsumerFactory = kafkaSimpleConsumerFactory;
+	}
+
+	public void setComplainceHandlerProcessor(ComplainceHandlerProcessor complainceHandlerProcessor) {
+		this.complainceHandlerProcessor = complainceHandlerProcessor;
 	}
 
 }

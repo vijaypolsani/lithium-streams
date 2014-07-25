@@ -22,13 +22,14 @@
 		class="com.lithium.streams.compliance.api.AbstractComplianceBatchService">
 	</bean>
 
+	<bean id="complainceHandlerProcessor" class="com.lithium.streams.compliance.handler.ComplainceHandlerProcessor"
+		autowire="byType" autowire-candidate="true">
+	</bean>
+
 	<bean id="complianceBatchStandalone" parent="abstractComplianceBatchService" class="com.lithium.streams.compliance.service.ComplianceBatchStandalone"
 		autowire="constructor" autowire-candidate="true">
 		<constructor-arg ref="kafkaSimpleConsumerFactory" />
 	</bean>
 
-	<bean id="complainceHandlerProcessor" class="com.lithium.streams.compliance.handler.ComplainceHandlerProcessor"
-		autowire="constructor" autowire-candidate="true">
-	</bean>
 
 </beans>

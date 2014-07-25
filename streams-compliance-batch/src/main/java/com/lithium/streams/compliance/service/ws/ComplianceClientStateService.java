@@ -37,14 +37,13 @@ public class ComplianceClientStateService {
 	* @throws ExecutionException
 	*/
 	@GET
-	@Path("bulk/time/{communityName}")
+	@Path("client/time")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Timed
 	@Metered
 	@ExceptionMetered
-	public String getBatchTimedEvents(@PathParam("communityName") String communityName,
-			@DefaultValue("demo") @QueryParam("login") String login, @QueryParam("startTime") String startTime,
-			@QueryParam("endTime") String endTime) throws InterruptedException, ExecutionException {
+	public String getBatchTimedEvents(@DefaultValue("demo") @QueryParam("login") String login)
+			throws InterruptedException, ExecutionException {
 		return "{'Jan12,2012,12.44PMPST','Jan13,2012,12.44PMPST'}";
 	}
 
@@ -59,14 +58,13 @@ public class ComplianceClientStateService {
 	 * @throws ExecutionException
 	 */
 	@GET
-	@Path("bulk/id/{communityName}")
+	@Path("client/id")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Timed
 	@Metered
 	@ExceptionMetered
-	public String getBatchIdEvents(@PathParam("communityName") String communityName,
-			@DefaultValue("demo") @QueryParam("login") String login, @QueryParam("startID") String startID,
-			@QueryParam("endId") String endId) throws InterruptedException, ExecutionException {
+	public String getBatchIdEvents(@DefaultValue("demo") @QueryParam("login") String login)
+			throws InterruptedException, ExecutionException {
 		return "{'123456789','223456789'}";
 	}
 

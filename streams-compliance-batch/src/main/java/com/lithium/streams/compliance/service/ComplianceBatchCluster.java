@@ -3,6 +3,9 @@ package com.lithium.streams.compliance.service;
 import java.util.Collection;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import kafka.javaapi.PartitionMetadata;
 import kafka.javaapi.TopicMetadataRequest;
 import kafka.javaapi.TopicMetadataResponse;
@@ -14,6 +17,8 @@ import com.lithium.streams.compliance.consumer.KafkaSimpleConsumerFactory;
 import com.lithium.streams.compliance.model.ComplianceMessage;
 
 public class ComplianceBatchCluster extends AbstractComplianceBatchService implements ClusterKafkaLowLevelApi {
+
+	private static final Logger log = LoggerFactory.getLogger(ComplianceBatchCluster.class);
 
 	public ComplianceBatchCluster(KafkaSimpleConsumerFactory kafkaSimpleConsumerFactory) {
 		super(kafkaSimpleConsumerFactory);

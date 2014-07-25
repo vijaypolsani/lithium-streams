@@ -1,10 +1,13 @@
 package com.lithium.streams.compliance.handler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.lithium.streams.compliance.api.ComplianceBatchHandler;
 import com.lithium.streams.compliance.api.ComplianceEvent;
 
 public class HeaderPopulateHandler implements ComplianceBatchHandler {
-
+	private static final Logger log = LoggerFactory.getLogger(HeaderPopulateHandler.class);
 	private ComplianceBatchHandler next;
 
 	@Override
@@ -14,7 +17,7 @@ public class HeaderPopulateHandler implements ComplianceBatchHandler {
 
 	@Override
 	public void handleRequest(ComplianceEvent event) {
-		System.out.println("Handle Request: HeaderPopulateHandler: " + event.getEvent());
+		log.info(">>> Handle Request: HeaderPopulateHandler: " + event.getEvent());
 	}
 
 	@Override

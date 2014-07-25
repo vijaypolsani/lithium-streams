@@ -1,4 +1,4 @@
-package com.lithium.streams.compliance.service.ws;
+package com.lithium.streams.compliance.api;
 
 import java.math.BigInteger;
 import java.util.concurrent.ExecutionException;

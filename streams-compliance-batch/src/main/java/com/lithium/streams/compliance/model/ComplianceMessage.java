@@ -1,9 +1,12 @@
 package com.lithium.streams.compliance.model;
 
+import java.io.Serializable;
+
 import com.lithium.streams.compliance.api.ComplianceEvent;
 
-public final class ComplianceMessage implements ComplianceEvent {
+public final class ComplianceMessage implements ComplianceEvent, Serializable {
 
+	private static final long serialVersionUID = 3296061517542908620L;
 	private final String trackingId;
 	private final ComplianceHeader complianceHeader;
 	private final CompliancePayload compliancePayload;

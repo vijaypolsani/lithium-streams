@@ -14,6 +14,8 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.health.HealthCheckRegistry;
 import com.codahale.metrics.servlets.AdminServlet;
+import com.lithium.streams.compliance.handler.ComplainceHandlerProcessor;
+import com.lithium.streams.compliance.service.ComplianceBatchStandalone;
 import com.lithium.streams.compliance.service.ws.ComplianceBatchService;
 import com.lithium.streams.compliance.service.ws.ComplianceClientStateService;
 import com.lithium.streams.compliance.util.DumpServlet;
@@ -33,6 +35,11 @@ public class AppConfiguration extends ResourceConfig {
 		//Note: The 'ComplianceService' registration will stop many thread creation on Kafka.
 		register(ComplianceBatchService.class);
 		register(ComplianceClientStateService.class);
+
+		//Bean used for Calling from REST Service
+		register(ComplianceBatchStandalone.class);
+		register(ComplainceHandlerProcessor.class);
+		
 	}
 
 	public static final ServletContextHandler getContextConfiguration() {
@@ -51,7 +58,6 @@ public class AppConfiguration extends ResourceConfig {
 
 		// Add REST Servlet
 		context.addServlet(new ServletHolder(new ServletContainer(new AppConfiguration())), "/compliance/*");
-		//context.addServlet(new ServletHolder(new ServletContainer()), "/test/*");
 
 		// Add servlets
 		context.addServlet(new ServletHolder(new AdminServlet()), "/admin/*");

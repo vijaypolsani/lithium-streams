@@ -1,10 +1,13 @@
 package com.lithium.streams.compliance.handler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.lithium.streams.compliance.api.ComplianceBatchHandler;
 import com.lithium.streams.compliance.api.ComplianceEvent;
 
 public class ClientTrackingHandler implements ComplianceBatchHandler {
-
+	private static final Logger log = LoggerFactory.getLogger(ClientTrackingHandler.class);
 	private ComplianceBatchHandler next;
 
 	@Override
@@ -24,7 +27,7 @@ public class ClientTrackingHandler implements ComplianceBatchHandler {
 
 	@Override
 	public void handleRequest(ComplianceEvent event) {
-		System.out.println("HandleRequest: ClientTrackingHandler:  Data: " + event.toString());
+		log.info(">>> Handle Request: ClientTrackingHandler:  Data: " + event.toString());
 	}
 
 }

@@ -1,9 +1,14 @@
 package com.lithium.streams.compliance.handler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.lithium.streams.compliance.api.ComplianceBatchHandler;
 import com.lithium.streams.compliance.model.ComplianceMessage;
 
 public final class ComplainceHandlerProcessor {
+	private static final Logger log = LoggerFactory.getLogger(ComplainceHandlerProcessor.class);
+
 	private ComplianceBatchHandler nextHandler;
 
 	public ComplainceHandlerProcessor() {
@@ -24,20 +29,21 @@ public final class ComplainceHandlerProcessor {
 
 	public ComplianceBatchHandler processChain(final ComplianceMessage complianceMessage) {
 		ComplianceBatchHandler temp = nextHandler;
-		while (temp != null) {
-			temp = nextHandler;
-			if (nextHandler != null)
-				nextHandler = nextHandler.getNext();
-			if (temp != null) {
-				System.out.print("\nReturned Object: " + temp + "\n");
-				temp.handleRequest(complianceMessage);
-			}
+		while (nextHandler != null) {
+			nextHandler.handleRequest(complianceMessage);
+			nextHandler = nextHandler.getNext();
 		}
+		if (nextHandler == null)
+			nextHandler = temp;
 		return temp;
 	}
 
-	public void printHandlerChain() {
-		System.out.print("List: " + nextHandler.toString() + "\n");
+	public String printHandlerChain() {
+		if (nextHandler != null) {
+			log.info(">>> List: " + nextHandler.toString());
+			return nextHandler.toString();
+		}
+		return "";
 	}
 
 }

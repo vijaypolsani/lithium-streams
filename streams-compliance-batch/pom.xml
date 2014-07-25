@@ -41,24 +41,22 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
 			<version>4.0.3.RELEASE</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
 			<version>4.0.3.RELEASE</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
 			<version>4.0.3.RELEASE</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
 			<version>4.0.3.RELEASE</version>
+			<scope>test</scope>
 		</dependency>
 		<!-- Commenting for Support of Jersey 2.8 <dependency> <groupId>io.dropwizard</groupId> <artifactId>dropwizard-core</artifactId> 
 			<version>0.7.0</version> </dependency> -->
