@@ -1,6 +1,8 @@
 package com.lithium.streams.compliance.service.ws;
 
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -55,29 +57,20 @@ public class ComplianceBatchService {
 		try {
 			final Collection<ComplianceMessage> messages = complianceBatchStandalone.processStream(COMMUNITY_NAME);
 			System.out.println(">> Data size Retrieved from kafka. " + messages.size());
-			ByteArrayOutputStream bo = new ByteArrayOutputStream();
-			try {
-				final ObjectOutputStream objectOutputStream = new ObjectOutputStream(bo);
-				final StreamingOutput streamingOutput = new StreamingOutput() {
-					@Override
-					public void write(OutputStream output) throws IOException, WebApplicationException {
-						try {
-							for (ComplianceMessage msg : messages) {
-								objectOutputStream.writeObject(msg);
-								output.write(bo.toByteArray());
-							}
-						} catch (Exception e) {
-							e.printStackTrace();
+			final StreamingOutput streamingOutput = new StreamingOutput() {
+				@Override
+				public void write(OutputStream output) throws IOException, WebApplicationException {
+					try {
+						for (ComplianceMessage msg : messages) {
+							output.write(msg.getEventPayload().getJsonMessage().getBytes());
 						}
-						output.flush();
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-				};
-				return Response.ok().entity(streamingOutput).type(MediaType.APPLICATION_OCTET_STREAM).build();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-				return Response.serverError().entity(e1.getLocalizedMessage()).type(MediaType.APPLICATION_JSON).build();
-			}
+					output.flush();
+				}
+			};
+			return Response.ok().entity(streamingOutput).type(MediaType.APPLICATION_OCTET_STREAM).build();
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
