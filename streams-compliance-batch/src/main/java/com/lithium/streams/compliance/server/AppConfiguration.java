@@ -1,14 +1,17 @@
 package com.lithium.streams.compliance.server;
 
+import java.util.EnumSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.servlet.DispatcherType;
 import javax.ws.rs.ApplicationPath;
 
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
 
 import com.codahale.metrics.MetricRegistry;
@@ -18,7 +21,9 @@ import com.lithium.streams.compliance.handler.ComplainceHandlerProcessor;
 import com.lithium.streams.compliance.service.ComplianceBatchStandalone;
 import com.lithium.streams.compliance.service.ws.ComplianceBatchService;
 import com.lithium.streams.compliance.service.ws.ComplianceClientStateService;
+import com.lithium.streams.compliance.util.ComplianceServerFilter;
 import com.lithium.streams.compliance.util.DumpServlet;
+import com.lithium.streams.compliance.util.GzipWriterInterceptor;
 
 @ApplicationPath("compliance")
 public class AppConfiguration extends ResourceConfig {
@@ -39,7 +44,9 @@ public class AppConfiguration extends ResourceConfig {
 		//Bean used for Calling from REST Service
 		register(ComplianceBatchStandalone.class);
 		register(ComplainceHandlerProcessor.class);
-		
+		register(com.lithium.streams.compliance.util.GzipWriterInterceptor.class);
+		property(ServerProperties.PROVIDER_CLASSNAMES, com.lithium.streams.compliance.util.GzipWriterInterceptor.class);
+
 	}
 
 	public static final ServletContextHandler getContextConfiguration() {
@@ -58,6 +65,9 @@ public class AppConfiguration extends ResourceConfig {
 
 		// Add REST Servlet
 		context.addServlet(new ServletHolder(new ServletContainer(new AppConfiguration())), "/compliance/*");
+		// Servlet Filter to convert to ZIP donwload or add more Headers.
+		context.addFilter(ComplianceServerFilter.class, "/compliance/*", EnumSet.of(DispatcherType.REQUEST,
+				DispatcherType.ASYNC, DispatcherType.FORWARD, DispatcherType.INCLUDE));
 
 		// Add servlets
 		context.addServlet(new ServletHolder(new AdminServlet()), "/admin/*");

@@ -1,7 +1,6 @@
 package com.lithium.streams.compliance.model;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 
 public final class ComplianceHeader implements Serializable {
 

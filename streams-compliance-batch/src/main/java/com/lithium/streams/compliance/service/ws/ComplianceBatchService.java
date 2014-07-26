@@ -1,10 +1,6 @@
 package com.lithium.streams.compliance.service.ws;
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
@@ -28,6 +24,7 @@ import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
 import com.lithium.streams.compliance.model.ComplianceMessage;
 import com.lithium.streams.compliance.service.ComplianceBatchStandalone;
+import com.lithium.streams.compliance.util.Compress;
 
 @Path("/v1")
 public class ComplianceBatchService {
@@ -47,6 +44,7 @@ public class ComplianceBatchService {
 	@GET
 	@Path("id")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	@Compress
 	@Timed
 	@Metered
 	@ExceptionMetered
@@ -70,11 +68,11 @@ public class ComplianceBatchService {
 					output.flush();
 				}
 			};
-			return Response.ok().entity(streamingOutput).type(MediaType.APPLICATION_OCTET_STREAM).build();
+			return Response.ok().entity(streamingOutput).build();
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-			return Response.serverError().entity(e1.getLocalizedMessage()).type(MediaType.APPLICATION_JSON).build();
+			return Response.serverError().entity(e1.getLocalizedMessage()).build();
 		}
 	}
 
@@ -84,7 +82,8 @@ public class ComplianceBatchService {
 
 	@GET
 	@Path("time")
-	@Produces(MediaType.APPLICATION_JSON)
+	//@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	@Compress
 	@Timed
 	@Metered
 	@ExceptionMetered
