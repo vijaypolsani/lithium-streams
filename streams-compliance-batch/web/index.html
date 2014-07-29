@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-ng-app="lithium">
 <head>
   <meta charset="utf-8">
   <title>Lithium Compliance Service!</title>
@@ -14,6 +14,7 @@
 	
 	<link href="css/bootstrap.min.css" rel="stylesheet">
 	<link href="css/style.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="lib/ng-grid.min.css"/>
 
   <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
   <!--[if lt IE 9]>
@@ -26,84 +27,40 @@
   <link rel="apple-touch-icon-precomposed" sizes="72x72" href="img/apple-touch-icon-72-precomposed.png">
   <link rel="apple-touch-icon-precomposed" href="img/apple-touch-icon-57-precomposed.png">
   <link rel="shortcut icon" href="img/favicon.png">
-  
-	<script type="text/javascript" src="js/jquery.min.js"></script>
-	<script type="text/javascript" src="js/bootstrap.min.js"></script>
+   	<script src="lib/angular.min.js"></script>
+   	<script src="lib/angular-route.min.js"></script>
+   	<script src="lib/jquery.min.js"></script>
+    <script src="lib/ui-bootstrap-tpls-0.11.0.min.js"></script>
+    <script src="lib/ng-grid-2.0.11.min.js"></script>
 	<script type="text/javascript" src="js/scripts.js"></script>
+	<!-- Good to include after angular.js -->	
+    <script src="script/compliance.js"></script>
 </head>
-
 <body>
-<div class="container">
+<div class="container" >
 	<div class="row clearfix">
 		<div class="col-md-12 column">
 			<div class="row clearfix">
 				<div class="alert alert-info">
-					<h2 class="text-primary text-center ">
+					<h3 class="text-center panel-title">
 						Lithium Activity Streams
-					</h2>
+					</h3>
 				</div>
 			</div>
-
-
-			<br>
-			<form role="form" class="form-inline" action="http://localhost:7070/compliance/v1/id" method="get">
-				<div class="form-group">
-					 <label for="start">Start Time</label><input type="text" class="form-control" id="start">
-				</div>
-				<div class="form-group">
-					 <label for="end">End Time</label><input type="text" class="form-control" id="end">
-				</div>
-				<div class="form-group">
-					 <label for="end">&nbsp</label><button type="submit" class="form-control btn-primary" id="end">Submit</button> 
-				</div>
-			</form>
-			<br><br>
-			<div class="tabbable" id="tabs-923319">
-				<ul class="nav nav-tabs">
-					<li class="active">
-						<a href="#panel-768578" data-toggle="tab">LIA</a>
-					</li>
-					<li>
-						<a href="#panel-336070" data-toggle="tab">LSW</a>
-					</li>
-				</ul>
-				<div class="tab-content">
-					<div class="tab-pane active" id="panel-768578">
-						<div class="progress">
-							<div class="progress-bar progress-success">
-							</div>
-						</div>
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<h3 class="panel-title">
-									LIA json Events
-								</h3>
-							</div>
-							<div class="panel-body">
-								{}
-							</div>
-						</div>
-					</div>
-					<div class="tab-pane" id="panel-336070">
-						<div class="progress">
-							<div class="progress-bar progress-success">
-							</div>
-						</div>
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<h3 class="panel-title">
-									LSW json Events
-								</h3>
-							</div>
-							<div class="panel-body">
-								{}
-							</div>
-						</div>
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<div class="row">
+						<p class="text-left text-primary">
+						     <a align="center" href="#/index">Compliance Events</a>
+						     <br>
+						     <a align="center"  href="#/client">Compliance Client Status View</a>
+						</p>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
+<div data-ng-view=""></div>
 </body>
 </html>

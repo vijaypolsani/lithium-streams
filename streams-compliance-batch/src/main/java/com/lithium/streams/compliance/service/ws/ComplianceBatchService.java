@@ -25,6 +25,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.lithium.streams.compliance.model.ComplianceMessage;
 import com.lithium.streams.compliance.service.ComplianceBatchStandalone;
 import com.lithium.streams.compliance.util.Compress;
+import com.lithium.streams.compliance.util.JsonFormatToArray;
 
 @Path("/v1")
 public class ComplianceBatchService {
@@ -54,17 +55,14 @@ public class ComplianceBatchService {
 		log.info(">> BatchLatestSequenceId Jersey Interface Called. " + clientId + " start=" + start + " end=" + end);
 		try {
 			final Collection<ComplianceMessage> messages = complianceBatchStandalone.processStream(COMMUNITY_NAME);
+
 			System.out.println(">> Data size Retrieved from kafka. " + messages.size());
 			final StreamingOutput streamingOutput = new StreamingOutput() {
+
 				@Override
 				public void write(OutputStream output) throws IOException, WebApplicationException {
-					try {
-						for (ComplianceMessage msg : messages) {
-							output.write(msg.getEventPayload().getJsonMessage().getBytes());
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+					String formattedData = JsonFormatToArray.convertToJsonArray(messages);
+					output.write(formattedData.getBytes());
 					output.flush();
 				}
 			};

@@ -15,6 +15,8 @@ public class GzipWriterInterceptor implements WriterInterceptor {
 	public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
 		final OutputStream outputStream = context.getOutputStream();
 		context.getHeaders().putSingle("Content-Encoding", "gzip");
+		context.getHeaders().putSingle("Access-Control-Allow-Origin", "*");
+		context.getHeaders().putSingle("Access-Control-Allow-Methods", "GET");
 		//context.getHeaders().putSingle("Content-Type", "application/json");
 		context.setOutputStream(new GZIPOutputStream(outputStream));
 		context.proceed();
