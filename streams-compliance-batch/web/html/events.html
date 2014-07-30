@@ -1,0 +1,79 @@
+
+<body >
+<div class="container" data-ng-controller="SimpleController">
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+			<br>
+			<form role="form" class="form-inline" >
+				<div class="form-group">
+					 <label for="start">Start Time</label><input type="text" class="form-control" id="start">
+				</div>
+				<div class="form-group">
+					 <label for="end">End Time</label><input type="text" class="form-control" id="end">
+				</div>
+				<div class="form-group">
+					 <label for="end">&nbsp</label><button type="submit" class="form-control btn-primary" id="end" ng-click="restCall()">Submit</button> 
+				</div>
+			</form>
+			<br><br>
+			<div class="tabbable" id="tabs-923319">
+				<ul class="nav nav-tabs">
+					<li class="active">
+						<a href="#panel-768578" data-toggle="tab">LIA</a>
+					</li>
+					<li>
+						<a href="#panel-336070" data-toggle="tab">LSW</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="panel-768578">
+						<div class="panel panel-default">
+							<div class="panel-body">
+							<div class="row">
+								<div class="col-md-12 column">
+								    <!--div class="gridStyle" data-ng-grid="gridOptions"></div-->
+									<table class="table table-hover table-condensed table-bordered">
+										<thead>
+											<tr class="active">
+												<th class="active"> 
+													<p class="text-center text-primary">Compliance Events {{numberOfEvents}}</p>
+												</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr class="success"  data-ng-repeat = "event in events track by $index"><td class="success"> {{event}}</td></tr>
+										</tbody>
+									</table>
+									<li class="animate-repeat" ng-if="numberOfEvents == 0">
+	  									<strong>No results found...</strong>
+									</li>
+									<li class="animate-repeat" ng-if="numberOfEvents == -1">
+	  									<strong>{{exception}}</strong>
+									</li>	
+								</div>
+							</div>
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane" id="panel-336070">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h4 class="panel-title">
+									Lithium LSW JSON Events
+								</h4>
+							</div>
+							<div class="panel-body">
+								<div class="grid">
+								    <!-- Specify a JavaScript controller script that binds Javascript variables to the HTML.-->
+								    <div class="gridStyle" data-ng-grid="gridOptions"></div>
+								</div>								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

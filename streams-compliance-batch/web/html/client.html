@@ -1,0 +1,32 @@
+
+<body >
+<div class="container" data-ng-controller="SimpleController">
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<p class="text-center text-primary"><strong>Compliance Client Status</strong></p>
+				</div>
+				<div class="panel-body">
+					<div class="row">
+						<div class="col-md-6 column">
+						     <!-- div class="gridStyle" ng-grid="gridOptions"></div-->
+						      Search &nbsp <input type="text" data-ng-model="filter.name" />{{name}}
+						     <br><br>
+						     Customer Name:
+						     <input type="text" data-ng-model="newCustomer.name" /> {{name}}
+						     Customer City:
+						     <input type="text" data-ng-model="newCustomer.city" /> {{name}}
+						     <button data-ng-click="addCustomer()">Add Customer</button>
+						</div>
+						<div class="col-md-6 column">
+							<li data-ng-repeat = "cust in customers| filter:filter.name | orderBy:'city' ">{{cust.name | uppercase}} - {{ cust.city | uppercase}}</li>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>
