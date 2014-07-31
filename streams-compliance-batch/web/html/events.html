@@ -6,13 +6,13 @@
 			<br>
 			<form role="form" class="form-inline" >
 				<div class="form-group">
-					 <label for="start">Start Time</label><input type="text" class="form-control" id="start">
+					 <label for="start">Start Time</label><input type="datetime-local" class="form-control" id="start"  name="start" placeholder="yyyy-MM-ddTHH:mm">
 				</div>
 				<div class="form-group">
-					 <label for="end">End Time</label><input type="text" class="form-control" id="end">
+					 <label for="end">End Time</label><input type="datetime-local" class="form-control" id="end" name="end" placeholder="yyyy-MM-ddTHH:mm">
 				</div>
 				<div class="form-group">
-					 <label for="end">&nbsp</label><button type="submit" class="form-control btn-primary" id="end" ng-click="restCall()">Submit</button> 
+					 <label for="end">&nbsp</label><button type="submit" class="form-control btn-primary" id="submit" ng-click="restCall()">Submit</button>
 				</div>
 			</form>
 			<br><br>
@@ -28,20 +28,93 @@
 				<div class="tab-content">
 					<div class="tab-pane active" id="panel-768578">
 						<div class="panel panel-default">
-							<div class="panel-body">
+							
 							<div class="row">
-								<div class="col-md-12 column">
-								    <!--div class="gridStyle" data-ng-grid="gridOptions"></div-->
-									<table class="table table-hover table-condensed table-bordered">
+								<div class="col-md-12 column" >
+									<p class="text-center text-info"><strong>Event Count {{numberOfEvents}}</strong></p>
+									<table class="table table-condensed table-responsive table-bordered" style="table-layout:auto">
 										<thead>
-											<tr class="active">
-												<th class="active"> 
-													<p class="text-center text-primary">Compliance Events {{numberOfEvents}}</p>
+											<tr class="info">
+												<th class="info"> 
+													<p class="text-center text-info">Event</p>
+												</th>
+												<th class="info"> 
+													<p class="text-center text-success">JSON</p>
 												</th>
 											</tr>
 										</thead>
 										<tbody>
-											<tr class="success"  data-ng-repeat = "event in events track by $index"><td class="success"> {{event}}</td></tr>
+											<tr class="info"  data-ng-repeat = "event in events track by $index" my-repeat-directive>
+												<td class="info"> 
+													<table class="table" style="table-layout:auto">
+														<tbody>
+															<tr class="info">
+																<td class="info"> 
+																	<p class="text-left">
+																	<small>
+																	<strong>FormatVersion: </strong><br>
+																	<strong>Published: </strong><br>
+																	<strong>Source: </strong><br>
+																	<strong>EventId: </strong><br>
+																	<strong>Service: </strong><br>
+																	<strong>Version: </strong><br>
+																	<strong>Uid: </strong><br>
+																	<strong>Login: </strong><br>
+																	<strong>RegistrationStatus: </strong> <br>
+																	<strong>Email: </strong><br>
+																	<strong>Type: </strong><br>
+																	<strong>RegistrationTime: </strong><br>
+																	<strong>Verb: </strong><br>
+																	<strong>Type: </strong><br>
+																	<strong>ConversationType: </strong><br>
+																	<strong>ObjectType: </strong><br>
+																	<strong>Id: </strong><br>
+																	<strong>DisplayName: </strong><br>
+																	<strong>Content: </strong><br>
+																	<strong>Visibility: </strong><br>
+																	<strong>Added: </strong><br>
+																	<strong>PostTime: </strong><br>
+																	<strong>IsTopic: </strong><br>
+																	</small>
+																	</p>												
+																</td>
+																<td class="info"> 
+																	<p class="text-left">
+																	<small>
+																	{{formatVersion}}<br>
+																	{{published}}<br> 
+																	{{source}} <br> 
+																	{{eventId}}<br> 
+																	{{service}}<br> 
+																	{{version}}<br>
+																	{{uid}}<br> 
+																	{{login}}<br> 
+																	{{registrationStatus}}<br> 
+																	{{email}}<br> 
+																	{{type}}<br> 
+																	{{registrationTime}}<br>
+																	{{verb}}<br> 
+																	{{type}}<br>
+																	{{conversationType}}<br> 
+																	{{objectType}}<br>
+																	{{id}}<br> 
+																	{{displayName}}<br>
+																	{{content}}<br> 
+																	{{visibility}}<br>
+																	{{added}}<br> 
+																	{{postTime}}<br>
+																	{{isTopic}}<br>
+																	</small>
+																	</p>												
+																</td>
+															</tr>
+														</tbody>
+													</table>											
+												</td>
+												<td class="info"> 
+													<p my-json-directive><small><pre class="text-left" ng-style="{color: 'green', 'background-color':'white'}">{{eventJson}}</pre></small></p>
+												</td>
+											</tr>
 										</tbody>
 									</table>
 									<li class="animate-repeat" ng-if="numberOfEvents == 0">
@@ -52,7 +125,7 @@
 									</li>	
 								</div>
 							</div>
-							</div>
+							
 						</div>
 					</div>
 					<div class="tab-pane" id="panel-336070">
