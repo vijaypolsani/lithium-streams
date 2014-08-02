@@ -1,5 +1,29 @@
 var lithium = angular.module('lithium',['ngRoute','ngProgress','ngGrid']);
 
+lithium.factory("simpleFactory", function(){
+		var factory = {};
+		var customers = [
+			{name:'WordCup', city:'Irvine', Drive: 'Stocks'},
+			{name:'Soccer', city:'Boston', Drive: 'Bonds'},
+			{name:'Tennis', city:'Seattle', Drive: 'Currencies'},
+			{name:'Chess', city:'San Ramon', Drive: 'Commercial Paper'},
+			{name:'Golf', city:'San Clemente', Drive: 'Commodities'}
+		];
+
+		var traders = [
+			{name:'Actiance', city:'Irvine', Drive: 'Stocks'},
+			{name:'Goldman', city:'Boston', Drive: 'Bonds'},
+			{name:'Barclay', city:'Seattle', Drive: 'Currencies'},
+			{name:'Jeffries', city:'San Ramon', Drive: 'Commercial Paper'},
+			{name:'StateStreet', city:'San Clemente', Drive: 'Commodities'}
+		];
+
+		factory.getCustomers = function(){
+			return customers;
+		};
+		return factory;
+});
+
 lithium.config(function ($routeProvider, ngProgressProvider){
 	// Default color is firebrick
        ngProgressProvider.setColor('firebrick');
@@ -25,7 +49,7 @@ lithium.config(function ($routeProvider, ngProgressProvider){
 });
 lithium.directive('myRepeatDirective', function() {
 	  return function($scope, element, attrs) {
-	    angular.element(element).css('color','blue');	    
+	    angular.element(element).css('color','black');	    
 	    var eventJson = angular.fromJson($scope.event);
 	    $scope.formatVersion = eventJson.formatVersion;
 	    $scope.published = eventJson.published;
@@ -61,7 +85,7 @@ lithium.directive('myJsonDirective', function() {
 	})
 
 
-lithium.controller ('SimpleController' , function($scope, $http, $timeout, ngProgress){
+lithium.controller ('SimpleController' , function($scope, $http, $timeout, simpleFactory, ngProgress){
 
 
 	$timeout(function(){
@@ -72,7 +96,7 @@ lithium.controller ('SimpleController' , function($scope, $http, $timeout, ngPro
 	$scope.restCall = function(){
 		ngProgress.start();
 	   $http({
-	        url: 'http://localhost:7070/compliance/v1/id',
+	        url: 'http://localhost:7070/compliance/v1/all',
 	        method: 'GET',
 	        params: {
 	            start: 1,
@@ -123,14 +147,9 @@ lithium.controller ('SimpleController' , function($scope, $http, $timeout, ngPro
         $event.stopPropagation();
         $scope.opened = true;
     };
+    //Factory injected into customers at Runtime
+	$scope.customers = simpleFactory.getCustomers;
 
-	$scope.customers = [
-		{name:'Actiance', city:'Irvine', Drive: 'Stocks'},
-		{name:'Goldman', city:'Boston', Drive: 'Bonds'},
-		{name:'Barclay', city:'Seattle', Drive: 'Currencies'},
-		{name:'Jeffries', city:'San Ramon', Drive: 'Commercial Paper'},
-		{name:'StateStreet', city:'San Clemente', Drive: 'Commodities'}
-	];
 	$scope.addCustomer = function(){
 		$scope.customers.push(
 			{

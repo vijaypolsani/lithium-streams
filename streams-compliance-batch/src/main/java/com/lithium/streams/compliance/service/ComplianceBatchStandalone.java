@@ -1,8 +1,8 @@
 package com.lithium.streams.compliance.service;
 
-import java.util.concurrent.ExecutionException;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import javax.ws.rs.core.Response;
+import java.util.Collection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import com.lithium.streams.compliance.api.AbstractComplianceBatchService;
 import com.lithium.streams.compliance.api.ComplianceBatchEvents;
 import com.lithium.streams.compliance.consumer.KafkaSimpleConsumerFactory;
+import com.lithium.streams.compliance.model.ComplianceMessage;
+import com.lithium.streams.compliance.util.BatchOperations;
 
 public class ComplianceBatchStandalone extends AbstractComplianceBatchService implements ComplianceBatchEvents {
 	private static final Logger log = LoggerFactory.getLogger(ComplianceBatchStandalone.class);
@@ -20,17 +22,18 @@ public class ComplianceBatchStandalone extends AbstractComplianceBatchService im
 	}
 
 	@Override
-	public Response getBatchLatestSequenceId(String clientId, String startId, String endId)
-			throws InterruptedException, ExecutionException {
-		// TODO Auto-generated method stub
-		return null;
+	public Collection<ComplianceMessage> processStream(String topicName) throws Exception {
+		checkNotNull(topicName, "Input Topic/Community name cannot be null.");
+		return super.process(new ComplianceContext(topicName, null, null), BatchOperations.ALL);
 	}
 
 	@Override
-	public Response getBatchLatestEndTime(String clientId, String startTime, String endTime)
-			throws InterruptedException, ExecutionException {
-		// TODO Auto-generated method stub
-		return null;
+	public Collection<ComplianceMessage> getMessagesFilteredByTime(String topicName, String start, String end)
+			throws Exception {
+		checkNotNull(topicName, "Input TopicName/CommunityName cannot be null.");
+		checkNotNull(start, "Input Start Time cannot be null.");
+		checkNotNull(end, "Input Start Time cannot be null.");
+		return super.process(new ComplianceContext(topicName, start, end), BatchOperations.FILTER_BY_TIME);
 	}
 
 }

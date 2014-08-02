@@ -33,6 +33,8 @@ import com.lithium.streams.compliance.handler.ComplainceHandlerProcessor;
 import com.lithium.streams.compliance.model.ComplianceHeader;
 import com.lithium.streams.compliance.model.ComplianceMessage;
 import com.lithium.streams.compliance.model.CompliancePayload;
+import com.lithium.streams.compliance.service.ComplianceContext;
+import com.lithium.streams.compliance.util.BatchOperations;
 
 public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi {
 
@@ -154,13 +156,13 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 		return topicMetaDataResponse;
 	}
 
-	@Override
-	public Collection<ComplianceMessage> processStream(final String topicName) throws Exception {
-		log.info(">>> Process Stream from Kafka for Topic: " + topicName);
-		long readOffset = getEarliestOffsetOfTopic(topicName);
+	protected Collection<ComplianceMessage> process(final ComplianceContext contex, BatchOperations operation)
+			throws Exception {
+		log.info(">>> Process Stream from Kafka for Topic: " + contex.getTopicName());
+		long readOffset = getEarliestOffsetOfTopic(contex.getTopicName());
 		List<ComplianceMessage> returnMessages = new ArrayList<>();
-		FetchResponse fetchResponse = getFetchResponse(topicName, readOffset);
-		for (MessageAndOffset messageAndOffset : fetchResponse.messageSet(topicName, Integer
+		FetchResponse fetchResponse = getFetchResponse(contex.getTopicName(), readOffset);
+		for (MessageAndOffset messageAndOffset : fetchResponse.messageSet(contex.getTopicName(), Integer
 				.parseInt(EnumKafkaProperties.PARTITION.getKafkaProperties()))) {
 			long currentOffset = messageAndOffset.offset();
 			if (currentOffset < readOffset) {
@@ -169,25 +171,28 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 			}
 			readOffset = messageAndOffset.nextOffset();
 			ByteBuffer payload = messageAndOffset.message().payload();
-
 			byte[] bytes = new byte[payload.limit()];
 			payload.get(bytes);
 			CompliancePayload compliancePayload = new CompliancePayload(new String(bytes, "UTF-8"));
 			log.info(">>> Offset:Data: " + String.valueOf(messageAndOffset.offset()) + ": "
 					+ compliancePayload.getJsonMessage());
-			ComplianceMessage complianceMessage = new ComplianceMessage.MsgBuilder(topicName + ":"
+			ComplianceMessage complianceMessage = new ComplianceMessage.MsgBuilder(contex.getTopicName() + ":"
 					+ messageAndOffset.offset()).header(
-					new ComplianceHeader.HeaderBuilder(System.currentTimeMillis()).communityId(topicName).build())
-					.payload(compliancePayload).build();
+					new ComplianceHeader.HeaderBuilder(System.currentTimeMillis()).communityId(contex.getTopicName())
+							.build()).payload(compliancePayload).build();
+			//Filtering Logic. Call MessageFilteringService
+
 			log.info(">>> Calling Processor:" + complainceHandlerProcessor.printHandlerChain());
 			complainceHandlerProcessor.processChain(complianceMessage);
 			log.info(">>> Completed Processor Chain Calls.");
 			returnMessages.add(complianceMessage);
+			
+			//End Filtering Service.
 		}
 		return returnMessages;
 	}
 
-	private FetchResponse getFetchResponse(final String topicName, long readOffset) throws Exception {
+	public FetchResponse getFetchResponse(final String topicName, long readOffset) throws Exception {
 		FetchRequest req = new FetchRequestBuilder().clientId(EnumKafkaProperties.CLIENT_NAME.getKafkaProperties())
 				.addFetch(topicName, Integer.parseInt(EnumKafkaProperties.PARTITION.getKafkaProperties()), readOffset,
 						1024000) // Note: this fetchSize of 100000 might need to be increased if large batches are written to Kafka

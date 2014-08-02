@@ -2,6 +2,7 @@ package com.lithium.streams.compliance.api;
 
 import java.util.Collection;
 
+import kafka.javaapi.FetchResponse;
 import kafka.javaapi.TopicMetadataRequest;
 import kafka.javaapi.TopicMetadataResponse;
 
@@ -46,9 +47,10 @@ public interface KafkaLowLevelApi {
 	 */
 	public abstract TopicMetadataResponse send(TopicMetadataRequest topicMeta) throws Exception;
 
+	
 	/**
-	 *  Process messages for implementation of message consumption
+	 *  Prepare the GetchResponse for a give TopicName & Offset
 	 */
-	public abstract Collection<ComplianceMessage> processStream(String topicName) throws Exception;
-
+	public abstract FetchResponse getFetchResponse(String topicName, long readOffset) throws Exception;
+	
 }
