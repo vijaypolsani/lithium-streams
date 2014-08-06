@@ -51,7 +51,11 @@ public class ComplianceBatchService {
 		log.info(">> BatchLatestSequenceId Jersey Interface Called. " + clientId);
 		try {
 			//Without Filtering.
-			final Collection<ComplianceMessage> messages = complianceBatchStandalone.processStream(COMMUNITY_NAME);
+			//final Collection<ComplianceMessage> messages = complianceBatchStandalone.processStream(COMMUNITY_NAME);
+			//With Filtering.
+
+			final Collection<ComplianceMessage> messages = complianceBatchStandalone.getMessagesFilteredByTime(
+					COMMUNITY_NAME, "", "");
 
 			System.out.println(">> Data size Retrieved from kafka. " + messages.size());
 			final StreamingOutput streamingOutput = new StreamingOutput() {
@@ -97,8 +101,9 @@ public class ComplianceBatchService {
 				}
 			};
 			return Response.ok().entity(streamingOutput).build();
+			//TODO: Is it possible to send single JSON messages one by one. The UI Logic or Client has to change.
+			//With an array, client can process differently than with a single messages. Reason to think....
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			return Response.serverError().entity(e1.getLocalizedMessage()).build();
 		}

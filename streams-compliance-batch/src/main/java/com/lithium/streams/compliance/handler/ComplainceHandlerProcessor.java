@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.lithium.streams.compliance.api.ComplianceBatchHandler;
+import com.lithium.streams.compliance.api.ComplianceEvent;
 import com.lithium.streams.compliance.model.ComplianceMessage;
 
 public final class ComplainceHandlerProcessor {
@@ -27,15 +28,17 @@ public final class ComplainceHandlerProcessor {
 		nextHandler = handler;
 	}
 
-	public ComplianceBatchHandler processChain(final ComplianceMessage complianceMessage) {
+	public ComplianceMessage processChain(final ComplianceMessage complianceMessage) {
 		ComplianceBatchHandler temp = nextHandler;
+		ComplianceMessage complianceIntermediateMsg = null;
 		while (nextHandler != null) {
-			nextHandler.handleRequest(complianceMessage);
+			final ComplianceEvent complianceEvent = nextHandler.handleRequest(complianceMessage);
+			complianceIntermediateMsg = complianceEvent.getEvent();
 			nextHandler = nextHandler.getNext();
 		}
 		if (nextHandler == null)
 			nextHandler = temp;
-		return temp;
+		return complianceIntermediateMsg;
 	}
 
 	public String printHandlerChain() {

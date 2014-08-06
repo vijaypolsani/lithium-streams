@@ -32,8 +32,12 @@ public final class ComplianceHeader implements Serializable {
 		private long sequenceId;
 		private String communityId;
 
-		public HeaderBuilder(long timeStampMilliSec) {
+		private HeaderBuilder(long timeStampMilliSec) {
 			this.timeStampMilliSec = timeStampMilliSec;
+		}
+
+		public static HeaderBuilder init(long timeStampMilliSec) {
+			return new HeaderBuilder(timeStampMilliSec);
 		}
 
 		public HeaderBuilder sequenceId(long sequenceId) {

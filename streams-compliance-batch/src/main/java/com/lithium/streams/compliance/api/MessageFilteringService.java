@@ -22,9 +22,10 @@ public interface MessageFilteringService {
 	public static final JsonFactory jsonFactory = new JsonFactory();
 	public static final DateFormat df = new SimpleDateFormat("dd:MM:yy:HH:mm:ss");
 	public static final Calendar cal = Calendar.getInstance();
-	public static final String SAMPLE_INPUT = "{\"event\":{\"id\":460849317,\"type\":\"ActionStart\",\"time\":1391213860448,\"frameId\":460849312,\"version\":\"13.11.0\",\"service\":\"lia\",\"source\":\"sathi.qa\",\"node\":\"9505DD71\"},\"payload\":{\"actionId\":460849313,\"actionKey\":\"nodes.update-node\",\"user\":{\"type$model\":\"user\",\"type\":\"user\",\"uid\":-1,\"registrationStatus\":\"anonymous\",\"login\":\"Anonymous\",\"email\":\"\",\"rankings\":[{\"ranking\":{\"type$model\":\"ranking\",\"type\":\"ranking\",\"uid\":-1,\"name\":\"N/A\"},\"node\":{\"type$model\":\"node\",\"type\":\"community\",\"uid\":1}}],\"roles\":[]}}}";
+	public static final String SAMPLE_INPUT = "{\"formatVersion\":\"1.0\",\"published\":\"1403887363553\",\"generator\":{\"source\":\"actiance.stage\",\"eventId\":\"3842328\"},\"provider\":{\"service\":\"lia\",\"version\":\"14.6.6\"},\"title\":\"EntityUpdated\",\"actor\":{\"uid\":\"1\",\"login\":\"admin\",\"registrationStatus\":\"FULLY_REGISTERED\",\"email\":\"admin@lithium.com\",\"type\":\"user\",\"registrationTime\":\"1402004942097\"},\"verb\":\"EntityUpdated user\",\"target\":{\"type\":\"user\",\"conversationType\":\"\",\"id\":\"1\",\"conversationId\":\"\"},\"streamObject\":{\"objectType\":\"\",\"id\":\"\",\"displayName\":\"\",\"content\":\"\",\"visibility\":\"\",\"subject\":\"\",\"added\":\"\",\"postTime\":\"\",\"isTopic\":\"false\"}}";
 
-	public static boolean filterByTime(String inputJsonStream, long startTime, long endTime) throws IOException {
+	public static boolean filterByTime(final String inputJsonStream, final long startTime, final long endTime)
+			throws IOException {
 		jsonFactory.enable(Feature.ALLOW_COMMENTS);
 		jsonFactory.enable(Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER);
 		jsonFactory.enable(Feature.ALLOW_SINGLE_QUOTES);
@@ -35,10 +36,9 @@ public interface MessageFilteringService {
 		jsonFactory.enable(Feature.ALLOW_UNQUOTED_FIELD_NAMES);
 		jsonFactory.enable(Feature.ALLOW_YAML_COMMENTS);
 		checkNotNull(inputJsonStream, "Message JSON that need to be parsed cannot be null.");
-		checkArgument(startTime <= 0, "Start time cannot be negative or 0. StartTime:  %d", startTime);
-		checkArgument(endTime <= 0, "End time cannot be negative or 0. EndTime:  %d", endTime);
-		checkArgument(startTime > endTime, "Start time cannot be later than end Time. StartTime: EndTime %d, %d",
-				startTime, endTime);
+		checkArgument(startTime >= 0, "Start time cannot be negative or less than 0. StartTime:  %d", startTime);
+		checkArgument(endTime >= 0, "End time cannot be negative or less than 0. EndTime:  %d", endTime);
+		checkArgument(startTime < endTime, "Expected Start time less than End Time. but %d > %d ", startTime, endTime);
 
 		boolean source = false;
 		try {
@@ -48,6 +48,8 @@ public interface MessageFilteringService {
 					|| jsonToken.equals(JsonToken.END_OBJECT))
 				jsonToken = jsonParser.nextToken();
 			// Had to put source == false check to exit before Payload Field. As it is causing issue in parsing with improper format.
+			System.out.println(">>> In Message Filtering. ");
+
 			while (jsonParser.hasCurrentToken() && jsonToken != JsonToken.VALUE_NULL && source == false) {
 				String fieldName = jsonParser.getCurrentName();
 				if (jsonToken == null || fieldName == null)
@@ -59,15 +61,15 @@ public interface MessageFilteringService {
 					long messageCurrentTime = Long.parseLong(published);
 
 					cal.setTimeInMillis(startTime);
-					log.info(">>> Query Start Time: " + df.format(cal.getTime()));
+					System.out.println(">>> Query Start Time: " + df.format(cal.getTime()));
 
 					cal.setTimeInMillis(messageCurrentTime);
-					log.info(">>> Published Time: (published): " + df.format(cal.getTime()));
+					System.out.println(">>> Published Time: (published): " + df.format(cal.getTime()));
 
 					cal.setTimeInMillis(endTime);
-					log.info(">>> Query End Time: " + df.format(cal.getTime()));
+					System.out.println(">>> Query End Time: " + df.format(cal.getTime()));
 					//Matching Logic
-					if ((startTime <= messageCurrentTime) && (endTime <= messageCurrentTime))
+					if ((startTime <= messageCurrentTime) && (endTime >= messageCurrentTime))
 						source = true;
 					break;
 				}

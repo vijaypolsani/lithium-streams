@@ -160,7 +160,7 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 			throws Exception {
 		log.info(">>> Process Stream from Kafka for Topic: " + contex.getTopicName());
 		long readOffset = getEarliestOffsetOfTopic(contex.getTopicName());
-		List<ComplianceMessage> returnMessages = new ArrayList<>();
+		final List<ComplianceMessage> returnMessages = new ArrayList<>();
 		FetchResponse fetchResponse = getFetchResponse(contex.getTopicName(), readOffset);
 		for (MessageAndOffset messageAndOffset : fetchResponse.messageSet(contex.getTopicName(), Integer
 				.parseInt(EnumKafkaProperties.PARTITION.getKafkaProperties()))) {
@@ -173,20 +173,23 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 			ByteBuffer payload = messageAndOffset.message().payload();
 			byte[] bytes = new byte[payload.limit()];
 			payload.get(bytes);
-			CompliancePayload compliancePayload = new CompliancePayload(new String(bytes, "UTF-8"));
+			CompliancePayload compliancePayload = CompliancePayload.init(new String(bytes, "UTF-8"));
 			log.info(">>> Offset:Data: " + String.valueOf(messageAndOffset.offset()) + ": "
 					+ compliancePayload.getJsonMessage());
-			ComplianceMessage complianceMessage = new ComplianceMessage.MsgBuilder(contex.getTopicName() + ":"
-					+ messageAndOffset.offset()).header(
-					new ComplianceHeader.HeaderBuilder(System.currentTimeMillis()).communityId(contex.getTopicName())
+			final ComplianceMessage complianceMessage = ComplianceMessage.MsgBuilder.init(
+					contex.getTopicName() + ":" + messageAndOffset.offset()).header(
+					ComplianceHeader.HeaderBuilder.init(System.currentTimeMillis()).communityId(contex.getTopicName())
 							.build()).payload(compliancePayload).build();
-			//Filtering Logic. Call MessageFilteringService
-
+			//INFO: CASE: Pre-Filter. When the messages size is huge OR other than simple filtering, then we may need to call
+			//the parallel workers to work on individual file. CASE: Post-Filter. Messages of this size and simplicity do not
+			//need Pre-Filtering. When things change, we will see how to change this.
+			//(CASE: Pre-Filter)Filtering Logic. Call MessageFilteringService
 			log.info(">>> Calling Processor:" + complainceHandlerProcessor.printHandlerChain());
+			//TODO: Future specific filtering needs.
 			complainceHandlerProcessor.processChain(complianceMessage);
 			log.info(">>> Completed Processor Chain Calls.");
 			returnMessages.add(complianceMessage);
-			
+
 			//End Filtering Service.
 		}
 		return returnMessages;

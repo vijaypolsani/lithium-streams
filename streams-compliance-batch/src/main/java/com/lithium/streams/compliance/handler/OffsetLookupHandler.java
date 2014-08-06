@@ -17,8 +17,9 @@ public class OffsetLookupHandler implements ComplianceBatchHandler {
 	}
 
 	@Override
-	public void handleRequest(ComplianceEvent event) {
+	public ComplianceEvent handleRequest(ComplianceEvent event) {
 		log.info(">>> Handle Request: OffsetLookupHandler: " + event.getEvent());
+		return event;
 	}
 
 	@Override

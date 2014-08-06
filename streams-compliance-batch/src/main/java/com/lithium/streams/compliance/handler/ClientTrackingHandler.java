@@ -26,8 +26,8 @@ public class ClientTrackingHandler implements ComplianceBatchHandler {
 	}
 
 	@Override
-	public void handleRequest(ComplianceEvent event) {
+	public ComplianceEvent handleRequest(ComplianceEvent event) {
 		log.info(">>> Handle Request: ClientTrackingHandler:  Data: " + event.toString());
+		return event;
 	}
-
 }

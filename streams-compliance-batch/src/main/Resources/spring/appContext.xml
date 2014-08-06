@@ -30,6 +30,10 @@
 		autowire="constructor" autowire-candidate="true">
 		<constructor-arg ref="kafkaSimpleConsumerFactory" />
 	</bean>
+	<!-- Akka System -->
+	<bean id="filteringSystem" class="com.lithium.streams.compliance.filter.FilteringSystem" autowire="constructor"
+		autowire-candidate="true">
+	</bean>
 
 
 </beans>

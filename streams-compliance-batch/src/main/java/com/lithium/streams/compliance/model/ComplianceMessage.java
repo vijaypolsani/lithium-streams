@@ -40,8 +40,12 @@ public final class ComplianceMessage implements ComplianceEvent, Serializable {
 		private ComplianceHeader complianceHeader;
 		private CompliancePayload compliancePayload;
 
-		public MsgBuilder(final String trackingId) {
+		private MsgBuilder(final String trackingId) {
 			this.trackingId = trackingId;
+		}
+
+		public static MsgBuilder init(final String trackingId) {
+			return new MsgBuilder(trackingId);
 		}
 
 		public MsgBuilder header(final ComplianceHeader complianceHeader) {
