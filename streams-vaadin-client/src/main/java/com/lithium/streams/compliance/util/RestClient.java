@@ -1,17 +1,11 @@
 package com.lithium.streams.compliance.util;
 
-import java.net.URI;
-
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import org.glassfish.jersey.media.sse.EventInput;
-import org.glassfish.jersey.media.sse.EventSource;
 import org.glassfish.jersey.media.sse.InboundEvent;
 import org.glassfish.jersey.media.sse.SseFeature;
 
@@ -25,7 +19,6 @@ public class RestClient {
 }
 
 class AsyncRequestProcessor implements Runnable {
-	//private static final String STREAMS_URL = "https://qa.lcloud.com/compliance/v1/live";
 	//private static final String STREAMS_URL = "http://10.240.180.18:6060/compliance/v1/live";
 	private static final String STREAMS_URL = "http://localhost:6060/compliance/v1/live";
 
