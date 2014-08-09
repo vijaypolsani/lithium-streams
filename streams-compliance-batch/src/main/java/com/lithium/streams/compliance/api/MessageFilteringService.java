@@ -48,7 +48,6 @@ public interface MessageFilteringService {
 					|| jsonToken.equals(JsonToken.END_OBJECT))
 				jsonToken = jsonParser.nextToken();
 			// Had to put source == false check to exit before Payload Field. As it is causing issue in parsing with improper format.
-			System.out.println(">>> In Message Filtering. ");
 
 			while (jsonParser.hasCurrentToken() && jsonToken != JsonToken.VALUE_NULL && source == false) {
 				String fieldName = jsonParser.getCurrentName();

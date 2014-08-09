@@ -1,6 +1,5 @@
 package com.lithium.streams.compliance.util;
 
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -35,7 +34,7 @@ public class JsonFormatToArray {
 			e.printStackTrace();
 			returnData = e.getLocalizedMessage();
 		}
-		log.info(returnData);
+		log.debug(returnData);
 		return returnData;
 	}
 }

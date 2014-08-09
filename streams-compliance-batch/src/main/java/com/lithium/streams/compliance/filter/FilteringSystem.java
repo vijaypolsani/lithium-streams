@@ -2,35 +2,63 @@ package com.lithium.streams.compliance.filter;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import scala.concurrent.Future;
+import scala.concurrent.duration.Duration;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
+import akka.actor.UntypedActor;
+import akka.actor.UntypedActorFactory;
+import akka.actor.dsl.Inbox.Inbox;
 
 import com.lithium.streams.compliance.api.MessageFilteringService;
 import com.lithium.streams.compliance.model.ComplianceMessage;
 import com.lithium.streams.compliance.model.CompliancePayload;
+import com.lithium.streams.compliance.util.BlockingQueueOfOne;
 
 public class FilteringSystem {
-	private static final int NUM_WORKERS = 8;
+	private static final int NUM_WORKERS = 6;
 	private static final String ACTOR_SYSTEM_NAME = "ComplianceFilterSystem";
 	private static final String ACTOR_SYSTEM_LISTENER = "ComplianceFilterListener";
 	private static final String ACTOR_SYSTEM_MASTER = "ComplianceFilterMaster";
 	private final ActorRef master;
+	private final ActorRef listener;
+	private final ActorSystem system;
+	private final akka.actor.Inbox inbox;
+	public static final Logger log = LoggerFactory.getLogger(FilteringSystem.class);
 
 	public FilteringSystem() {
-		this.master = getMasterActor();
+		// Create an Akka system
+		this.system = ActorSystem.create(ACTOR_SYSTEM_NAME);
+		//Create Inbox
+		this.inbox = Inbox.create(system);
+		// create the result listener, which will print the result and shutdown the system
+		this.listener = system.actorOf(Props.create(FilterResponseListener.class), ACTOR_SYSTEM_LISTENER);
+		// create the master
+		this.master = system.actorOf(Props.create(new MasterFactory(NUM_WORKERS, listener)), ACTOR_SYSTEM_MASTER);
+
 	}
 
-	private ActorRef getMasterActor() {
-		// Create an Akka system
-		ActorSystem system = ActorSystem.create(ACTOR_SYSTEM_NAME);
-		// create the result listener, which will print the result and shutdown the system
-		final ActorRef listener = system.actorOf(Props.create(FilterResponseListener.class), ACTOR_SYSTEM_LISTENER);
-		// create the master
-		final ActorRef master = system.actorOf(Props.create(new MasterFactory(NUM_WORKERS, listener)),
-				ACTOR_SYSTEM_MASTER);
+	public ActorRef getMaster() {
 		return master;
+	}
+
+	public ActorSystem getActorSystem() {
+		return system;
+	}
+
+	public akka.actor.Inbox getInbox() {
+		return inbox;
+	}
+
+	public ActorRef getListener() {
+		return listener;
 	}
 
 	public void filter(Collection<ComplianceMessage> messages, long startTime, long endTime) {
@@ -55,7 +83,17 @@ public class FilteringSystem {
 			messages.add(msg);
 		}
 		FilteringSystem filteringSystem = new FilteringSystem();
-		filteringSystem.filter(messages, startTime, endTime);
+
+		//filteringSystem.filter(messages, startTime, endTime);
 		//String inputJsonStream, long startTime, long endTime
+
+		filteringSystem.inbox.send(filteringSystem.getMaster(), new Request(messages, startTime, endTime));
+		//filteringSystem.inbox.watch(filteringSystem.getSubscriber());
+		filteringSystem.inbox.watch(filteringSystem.getListener());
+		System.out.println(">>>Received message from FilterSystem: "
+				+ filteringSystem.inbox.receive(Duration.create(5, TimeUnit.SECONDS)).toString());
+		System.out.println(" Inbox ActorRef: " + filteringSystem.getListener().toString());
+
 	}
+
 }

@@ -1,14 +1,13 @@
 package com.lithium.streams.compliance.filter;
 
-import java.util.Collection;
-
+import com.google.common.collect.ImmutableCollection;
 import com.lithium.streams.compliance.model.ComplianceMessage;
 
 public class Result {
-	private final Collection<ComplianceMessage> messages;
+	private final ImmutableCollection<ComplianceMessage> messages;
 	private final long duration;
 
-	public Result(Collection<ComplianceMessage> messages, long duration) {
+	public Result(ImmutableCollection<ComplianceMessage> messages, long duration) {
 		this.messages = messages;
 		this.duration = duration;
 	}
@@ -16,7 +15,7 @@ public class Result {
 	/**
 	 * @return the messages
 	 */
-	public Collection<ComplianceMessage> getMessages() {
+	public ImmutableCollection<ComplianceMessage> getMessages() {
 		return messages;
 	}
 
