@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
 import akka.actor.ActorRef;
@@ -16,6 +17,8 @@ import akka.actor.Props;
 import akka.actor.UntypedActor;
 import akka.actor.UntypedActorFactory;
 import akka.actor.dsl.Inbox.Inbox;
+import akka.pattern.Patterns;
+import akka.util.Timeout;
 
 import com.lithium.streams.compliance.api.MessageFilteringService;
 import com.lithium.streams.compliance.model.ComplianceMessage;
@@ -82,18 +85,26 @@ public class FilteringSystem {
 					CompliancePayload.init(MessageFilteringService.SAMPLE_INPUT)).build();
 			messages.add(msg);
 		}
+		Timeout timeout = new Timeout(Duration.create(5, "seconds"));
+
 		FilteringSystem filteringSystem = new FilteringSystem();
+		Future<Object> future = Patterns.ask(filteringSystem.getMaster(), new Request(messages, startTime, endTime),
+				timeout);
+		try {
+			String result = (String) Await.result(future, timeout.duration());
+			System.out.println("Result: " + result);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		//filteringSystem.filter(messages, startTime, endTime);
 		//String inputJsonStream, long startTime, long endTime
 
 		filteringSystem.inbox.send(filteringSystem.getMaster(), new Request(messages, startTime, endTime));
 		//filteringSystem.inbox.watch(filteringSystem.getSubscriber());
-		filteringSystem.inbox.watch(filteringSystem.getListener());
-		System.out.println(">>>Received message from FilterSystem: "
-				+ filteringSystem.inbox.receive(Duration.create(5, TimeUnit.SECONDS)).toString());
-		System.out.println(" Inbox ActorRef: " + filteringSystem.getListener().toString());
-
+		//filteringSystem.inbox.watch(filteringSystem.getListener());
+		//System.out.println(">>>Received message from FilterSystem: "+ filteringSystem.inbox.receive(Duration.create(5, TimeUnit.SECONDS)).toString());
+		//System.out.println(" Inbox ActorRef: " + filteringSystem.getListener().toString());
 	}
-
 }

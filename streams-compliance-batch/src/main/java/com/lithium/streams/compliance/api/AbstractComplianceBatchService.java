@@ -67,7 +67,7 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 		OffsetResponse response = consumer.getOffsetsBefore(request);
 
 		if (response.hasError()) {
-			System.out.println("<<< Error fetching data Offset Data the Broker. Reason: "
+			log.error("<<< Error fetching data Offset Data the Broker. Reason: "
 					+ response.errorCode(topicName, Integer
 							.parseInt(EnumKafkaProperties.PARTITION.getKafkaProperties())) + " Exception Response: "
 					+ response.toString());
@@ -93,7 +93,7 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 		OffsetResponse response = consumer.getOffsetsBefore(request);
 
 		if (response.hasError()) {
-			System.out.println("<<< Error fetching data Offset Data the Broker. Reason: "
+			log.error("<<< Error fetching data Offset Data the Broker. Reason: "
 					+ response.errorCode(topicName, Integer
 							.parseInt(EnumKafkaProperties.PARTITION.getKafkaProperties())) + " Exception Response: "
 					+ response.toString());
@@ -120,7 +120,7 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 		OffsetResponse response = consumer.getOffsetsBefore(request);
 
 		if (response.hasError()) {
-			System.out.println("<<< Error fetching data Offset Data the Broker. Reason: "
+			log.error("<<< Error fetching data Offset Data the Broker. Reason: "
 					+ response.errorCode(topicName, Integer
 							.parseInt(EnumKafkaProperties.PARTITION.getKafkaProperties())) + " Exception Response: "
 					+ response.toString());
@@ -159,6 +159,7 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 	protected Collection<ComplianceMessage> process(final ComplianceContext contex, BatchOperations operation)
 			throws Exception {
 		log.info(">>> Process Stream from Kafka for Topic: " + contex.getTopicName());
+		long start = System.currentTimeMillis();
 		long readOffset = getEarliestOffsetOfTopic(contex.getTopicName());
 		final List<ComplianceMessage> returnMessages = new ArrayList<>();
 		FetchResponse fetchResponse = getFetchResponse(contex.getTopicName(), readOffset);
@@ -174,7 +175,7 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 			byte[] bytes = new byte[payload.limit()];
 			payload.get(bytes);
 			CompliancePayload compliancePayload = CompliancePayload.init(new String(bytes, "UTF-8"));
-			log.info(">>> Offset:Data: " + String.valueOf(messageAndOffset.offset()) + ": "
+			log.debug(">>> Offset:Data: " + String.valueOf(messageAndOffset.offset()) + ": "
 					+ compliancePayload.getJsonMessage());
 			final ComplianceMessage complianceMessage = ComplianceMessage.MsgBuilder.init(
 					contex.getTopicName() + ":" + messageAndOffset.offset()).header(
@@ -184,12 +185,11 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 			//the parallel workers to work on individual file. CASE: Post-Filter. Messages of this size and simplicity do not
 			//need Pre-Filtering. When things change, we will see how to change this.
 			//(CASE: Pre-Filter)Filtering Logic. Call MessageFilteringService
-			log.info(">>> Calling Processor:" + complainceHandlerProcessor.printHandlerChain());
+			log.debug(">>> Calling Processor:" + complainceHandlerProcessor.printHandlerChain());
 			//TODO: Future specific filtering needs.
 			complainceHandlerProcessor.processChain(complianceMessage);
-			log.info(">>> Completed Processor Chain Calls.");
+			log.debug(">>> Completed Processor Chain Calls. Time ms: " + (System.currentTimeMillis() - start));
 			returnMessages.add(complianceMessage);
-
 			//End Filtering Service.
 		}
 		return returnMessages;
@@ -208,7 +208,7 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 			// Something went wrong!
 			short code = fetchResponse.errorCode(topicName, Integer.parseInt(EnumKafkaProperties.PARTITION
 					.getKafkaProperties()));
-			System.out.println("Error fetching data from the Broker:" + 0 + " Reason: " + code);
+			log.info("Error fetching data from the Broker:" + 0 + " Reason: " + code);
 			if (numErrors > 5)
 				return null;
 			if (code == ErrorMapping.OffsetOutOfRangeCode()) {

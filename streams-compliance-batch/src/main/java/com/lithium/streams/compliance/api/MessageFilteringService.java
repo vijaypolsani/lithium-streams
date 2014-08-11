@@ -60,13 +60,13 @@ public interface MessageFilteringService {
 					long messageCurrentTime = Long.parseLong(published);
 
 					cal.setTimeInMillis(startTime);
-					System.out.println(">>> Query Start Time: " + df.format(cal.getTime()));
+					log.info(">>> Query Start Time: " + df.format(cal.getTime()));
 
 					cal.setTimeInMillis(messageCurrentTime);
-					System.out.println(">>> Published Time: (published): " + df.format(cal.getTime()));
+					log.info(">>> Published Time: (published): " + df.format(cal.getTime()));
 
 					cal.setTimeInMillis(endTime);
-					System.out.println(">>> Query End Time: " + df.format(cal.getTime()));
+					log.info(">>> Query End Time: " + df.format(cal.getTime()));
 					//Matching Logic
 					if ((startTime <= messageCurrentTime) && (endTime >= messageCurrentTime))
 						source = true;

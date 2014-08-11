@@ -19,14 +19,15 @@ public class Worker extends UntypedActor {
 			Work work = (Work) message;
 			boolean isExisting = MessageFilteringService.filterByTime(work.getUnfilteredMessage().getEventPayload()
 					.getJsonMessage(), work.getStartTime(), work.getEndTime());
-			log.debug("Message Valid? " + isExisting);
-			//System.out.println("Worker Name: " + this.hashCode() + " Result:" + result);
+			log.debug(">>> Is Message Valid? " + isExisting);
+			//log.debug("Worker Name: " + this.hashCode() + " Result:" + result);
 			if (isExisting) {
-				getSender().tell(work, getSelf());
-				log.debug("Success. Message passes Filter Criteria: ");
-			} else
-				log.debug("Failed. Message DO NOT PASS Filter Criteria: "
+				log.debug(">>> Success. Message passes Filter Criteria: "
 						+ work.getUnfilteredMessage().getEventPayload().getJsonMessage());
+			} else
+				log.debug("<<< Failed. Message DO NOT PASS Filter Criteria: "
+						+ work.getUnfilteredMessage().getEventPayload().getJsonMessage());
+			getSender().tell(new WorkResponse(work, isExisting), getSelf());
 
 		} else {
 			unhandled(message);

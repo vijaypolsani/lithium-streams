@@ -96,7 +96,8 @@ lithium.controller ('SimpleController' , function($scope, $http, $timeout, simpl
 	$scope.restCall = function(){
 		ngProgress.start();
 	   $http({
-	        url: 'http://localhost:7070/compliance/v1/all',
+	        //url: 'http://localhost:7070/compliance/v1/all',
+	        url: 'http://localhost:7070/compliance/v1/id',
 	        method: 'GET',
 	        params: {
 	            start: 1,

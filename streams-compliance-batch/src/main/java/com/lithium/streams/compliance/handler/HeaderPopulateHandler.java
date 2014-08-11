@@ -17,7 +17,7 @@ public class HeaderPopulateHandler implements ComplianceBatchHandler {
 
 	@Override
 	public ComplianceEvent handleRequest(ComplianceEvent event) {
-		log.info(">>> Handle Request: HeaderPopulateHandler: " + event.getEvent());
+		log.debug(">>> Handle Request: HeaderPopulateHandler: " + event.getEvent());
 		return event;
 	}
 

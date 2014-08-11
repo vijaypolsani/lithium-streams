@@ -86,7 +86,7 @@ public class ComplianceBatchService {
 	public Response getMessagesFilterdByTime(@HeaderParam("client-id") String clientId,
 			@QueryParam("start") String start, @QueryParam("end") String end) throws InterruptedException,
 			ExecutionException {
-		log.info(">> BatchLatestSequenceId Jersey Interface Called. " + clientId + " start=" + start + " end=" + end);
+		log.info(">>> Batch Messages from REST Call. " + clientId + " start=" + start + " end=" + end);
 		try {
 			//With Filtering.
 			final Collection<ComplianceMessage> messages = complianceBatchStandalone.getMessagesFilteredByTime(

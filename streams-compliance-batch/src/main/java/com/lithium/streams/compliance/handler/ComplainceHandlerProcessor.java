@@ -43,7 +43,7 @@ public final class ComplainceHandlerProcessor {
 
 	public String printHandlerChain() {
 		if (nextHandler != null) {
-			log.info(">>> List: " + nextHandler.toString());
+			log.debug(">>> List: " + nextHandler.toString());
 			return nextHandler.toString();
 		}
 		return "";
