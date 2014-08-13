@@ -3,19 +3,11 @@ var lithium = angular.module('lithium',['ngRoute','ngProgress','ngGrid']);
 lithium.factory("simpleFactory", function(){
 		var factory = {};
 		var customers = [
-			{name:'WordCup', city:'Irvine', Drive: 'Stocks'},
-			{name:'Soccer', city:'Boston', Drive: 'Bonds'},
-			{name:'Tennis', city:'Seattle', Drive: 'Currencies'},
-			{name:'Chess', city:'San Ramon', Drive: 'Commercial Paper'},
-			{name:'Golf', city:'San Clemente', Drive: 'Commodities'}
-		];
-
-		var traders = [
-			{name:'Actiance', city:'Irvine', Drive: 'Stocks'},
-			{name:'Goldman', city:'Boston', Drive: 'Bonds'},
-			{name:'Barclay', city:'Seattle', Drive: 'Currencies'},
-			{name:'Jeffries', city:'San Ramon', Drive: 'Commercial Paper'},
-			{name:'StateStreet', city:'San Clemente', Drive: 'Commodities'}
+			{name:'JPMorgan', city:'Seattle', Drive: 'Stocks'},
+			{name:'Goldman', city:'New York', Drive: 'Bonds'},
+			{name:'Barclay', city:'San Francisco', Drive: 'Currencies'},
+			{name:'Jeffries', city:'Chicago', Drive: 'Commodities'},
+			{name:'StateStreet', city:'Boston', Drive: 'ETF'}
 		];
 
 		factory.getCustomers = function(){
@@ -95,13 +87,15 @@ lithium.controller ('SimpleController' , function($scope, $http, $timeout, simpl
 
 	$scope.restCall = function(){
 		ngProgress.start();
+		console.log("Rest call parameters Start: "+$scope.start)
+		console.log("Rest call parameters End: "+$scope.end)
 	   $http({
 	        //url: 'http://localhost:7070/compliance/v1/all',
 	        url: 'http://localhost:7070/compliance/v1/id',
 	        method: 'GET',
 	        params: {
-	            start: 1,
-	            end: 1000
+	            start: $scope.start,
+	            end: $scope.end
 	        }
 	    }).success(function (data, status, headers, config) {
 	    	ngProgress.complete();

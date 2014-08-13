@@ -88,6 +88,13 @@ public class ComplianceBatchService {
 			ExecutionException {
 		log.info(">>> Batch Messages from REST Call. " + clientId + " start=" + start + " end=" + end);
 		try {
+			//IMP: START: REMOVE: Testing. REMOVE After DEMO.
+			if (start == null)
+				start = (System.currentTimeMillis() - 9999999999l) + "";
+			if (end == null)
+				end = System.currentTimeMillis() + "";
+			//REMOVE: END 
+
 			//With Filtering.
 			final Collection<ComplianceMessage> messages = complianceBatchStandalone.getMessagesFilteredByTime(
 					COMMUNITY_NAME, start, end);
