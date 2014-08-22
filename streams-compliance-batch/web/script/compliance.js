@@ -1,4 +1,4 @@
-var lithium = angular.module('lithium',['ngRoute','ngProgress','ngGrid']);
+var lithium = angular.module('lithium',['ngRoute','ngGrid']);
 
 lithium.factory("simpleFactory", function(){
 		var factory = {};
@@ -16,11 +16,7 @@ lithium.factory("simpleFactory", function(){
 		return factory;
 });
 
-lithium.config(function ($routeProvider, ngProgressProvider){
-	// Default color is firebrick
-       ngProgressProvider.setColor('firebrick');
-    // Default height is 2px
-       ngProgressProvider.setHeight('2px');
+lithium.config(function ($routeProvider){
 
 	$routeProvider
 		.when('/client',
@@ -77,36 +73,32 @@ lithium.directive('myJsonDirective', function() {
 	})
 
 
-lithium.controller ('SimpleController' , function($scope, $http, $timeout, simpleFactory, ngProgress){
+lithium.controller ('SimpleController' , function($scope, $http, $timeout, simpleFactory){
 
-
-	$timeout(function(){
-            ngProgress.complete();
-            $scope.show = true;
-    }, 2000);
 
 	$scope.restCall = function(){
-		ngProgress.start();
-		console.log("Rest call parameters Start: "+$scope.start)
-		console.log("Rest call parameters End: "+$scope.end)
+		console.log("Rest call parameters Start: " + $scope.startTime);
+		console.log("Rest call parameters End: " + $scope.endTime);
 	   $http({
-	        //url: 'http://localhost:7070/compliance/v1/all',
 	        url: 'http://localhost:7070/compliance/v1/id',
+	        //PROD
+	        //url: 'http://10.240.180.18:7070/compliance/v1/id',
+	        //PROD
+	        //url: 'http://10.240.180.18:7070/compliance/v1/all',
+	        //url: 'http://localhost:7070/compliance/v1/all',
 	        method: 'GET',
 	        params: {
-	            start: $scope.start,
-	            end: $scope.end
+	            start: $scope.startTime,
+	            end: $scope.endTime
 	        }
 	    }).success(function (data, status, headers, config) {
-	    	ngProgress.complete();
-	        $scope.events = data;
+	    	$scope.events = data;
 	        $scope.numberOfEvents = data.length;
 	       	$scope.iter = 0;
 	        console.log("Success: Status="+status );
 
 	    }).error(function(data, status, headers, config) {
-	    	ngProgress.reset();
-	        $scope.exception = data;
+	    	$scope.exception = data;
 	        $scope.numberOfEvents = -1;
 	        console.log("Exception: "+data);
 	    });

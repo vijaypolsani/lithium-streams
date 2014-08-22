@@ -31,10 +31,11 @@ import com.lithium.streams.compliance.util.JsonFormatToArray;
 public class ComplianceBatchService {
 
 	private static final Logger log = LoggerFactory.getLogger(ComplianceBatchService.class);
-	private static final String COMMUNITY_NAME = "lia";
-	//private static final String COMMUNITY_NAME = "actiance.stage";
+	//private static final String COMMUNITY_NAME = "lia";
+	private static final String COMMUNITY_NAME = "actiance.stage";
 	private static final String LOGIN = "-user";
 	private static final String PASSCODE = "sCe9KITKh8+h1w4e9EDnVwzXBM8NjiilrWS6dOdMNr0=";
+	private static final String IS_NUMBER_MATCHER = ".*\\d.*";
 
 	@Inject
 	private ComplianceBatchStandalone complianceBatchStandalone;
@@ -89,9 +90,10 @@ public class ComplianceBatchService {
 		log.info(">>> Batch Messages from REST Call. " + clientId + " start=" + start + " end=" + end);
 		try {
 			//IMP: START: REMOVE: Testing. REMOVE After DEMO.
-			if (start == null)
+			// JavaScript tend to send '{}' and has to be verified for NON A NUMBER, to stop causing NumberFormatException.
+			if (start == null || start.trim().length() == 0 || !start.matches(IS_NUMBER_MATCHER))
 				start = (System.currentTimeMillis() - 9999999999l) + "";
-			if (end == null)
+			if (end == null || end.trim().length() == 0 || !end.matches(IS_NUMBER_MATCHER))
 				end = System.currentTimeMillis() + "";
 			//REMOVE: END 
 

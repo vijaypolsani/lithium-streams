@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +23,11 @@ import com.lithium.streams.compliance.filter.Request;
 import com.lithium.streams.compliance.filter.Result;
 import com.lithium.streams.compliance.model.ComplianceMessage;
 import com.lithium.streams.compliance.util.BatchOperations;
+import com.lithium.streams.compliance.util.DateFormatter;
 
 public class ComplianceBatchStandalone extends AbstractComplianceBatchService implements ComplianceBatchEvents {
 	private static final Logger log = LoggerFactory.getLogger(ComplianceBatchStandalone.class);
-
+	private static final int TIME_OUT = 10; // Sec
 	@Autowired
 	private FilteringSystem filteringSystem;
 
@@ -65,9 +65,13 @@ public class ComplianceBatchStandalone extends AbstractComplianceBatchService im
 		//filteringSystem.filter(unfilteredMessages, startTime, endTime);
 
 		//Sync Call with local Listener.
-		Timeout t = new Timeout(10, TimeUnit.SECONDS);
-		Future<Object> fut = Patterns.ask(filteringSystem.getMaster(), new Request(unfilteredMessages, Long
-				.parseLong(startTime), Long.parseLong(endTime)), t);
+		Timeout t = new Timeout(TIME_OUT, TimeUnit.SECONDS);
+		long startT = DateFormatter.formatDate(startTime);
+		log.info(">>>Start Time: " + startT);
+		long endT = DateFormatter.formatDate(endTime);
+		log.info(">>>End Time: " + endT);
+		Future<Object> fut = Patterns
+				.ask(filteringSystem.getMaster(), new Request(unfilteredMessages, startT, endT), t);
 		Result result = null;
 		try {
 			result = (Result) Await.result(fut, t.duration());

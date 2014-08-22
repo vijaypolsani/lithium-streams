@@ -6,10 +6,10 @@
 			<br>
 			<form role="form" class="form-inline" >
 				<div class="form-group">
-					 <label for="start">Start Time</label><input type="datetime-local" class="form-control" id="start"  name="start" placeholder="yyyy-MM-ddTHH:mm" data-ng-modal="start">
+					 <label for="start">Start Time</label><input type="datetime-local" class="form-control" placeholder="yyyy-MM-ddTHH:mm" data-ng-model="startTime">
 				</div>
-				<div class="form-group" data-ng-modal="end">
-					 <label for="end">End Time</label><input type="datetime-local" class="form-control" id="end" name="end" placeholder="yyyy-MM-ddTHH:mm">
+				<div class="form-group">
+					 <label for="end">End Time</label><input type="datetime-local" class="form-control" placeholder="yyyy-MM-ddTHH:mm" data-ng-model="endTime">
 				</div>
 				<div class="form-group">
 					 <label for="end">&nbsp</label><button type="submit" class="form-control btn-primary" id="submit" ng-click="restCall()">Submit</button>

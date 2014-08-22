@@ -92,8 +92,10 @@ public class MinimalServer {
 		logHandler.setRequestLog(requestLog);
 
 		ResourceHandler resourceHandler = new ResourceHandler();
-		resourceHandler
-				.setResourceBase("/Users/vijay.polsani/_eclipseworkspace/lithium-streams/streams-compliance-batch/web/index.html");
+		//Local Dev
+		//resourceHandler.setResourceBase("/Users/vijay.polsani/_eclipseworkspace/lithium-streams/streams-compliance-batch/web/index.html");
+		//Prod 
+		resourceHandler.setResourceBase("/home/user/app/streams-compliance-batch/streams-compliance-batch/web/index.html");
 		resourceHandler.setDirectoriesListed(true);
 		resourceHandler.setWelcomeFiles(new String[] { "index.html" });
 		resourceHandler.setResourceBase("./web");
