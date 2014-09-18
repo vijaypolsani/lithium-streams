@@ -135,13 +135,8 @@ public class TestFixedSizeSortedSet {
 					createMockKeySource()).times(1).andReturn(createMockKeySource()).times(100);
 			EasyMock.replay(keySourceUtil);
 			for (int i = 5; i > 0; i--) {
-				try {
-					log.info("--- Adding a new KeySource to Holder: " + keySourceUtil.getKeySource());
-					keySourceHolder = new KeySourceHolder(keySourceUtil.getKeySource());
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				log.info("--- Adding a new KeySource to Holder: " + keySourceUtil.getKeySource());
+				keySourceHolder = new KeySourceHolder(keySourceUtil.getKeySource());
 				log.info("--- New KeySource added to Stack: " + twoSizeSortedSet.add(keySourceHolder));
 
 				Optional<KeySource> previousKeySource = twoSizeSortedSet.getKeySource(keySourceHolder);

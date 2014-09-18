@@ -51,9 +51,6 @@ public class EncryptionMain {
 				}
 			}
 
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

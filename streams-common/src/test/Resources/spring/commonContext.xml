@@ -11,25 +11,17 @@
 	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
 
 	<!-- Definition for Compliance App Spring Service beans -->
-	<bean id="keyServerEncryption" class="com.lithium.streams.compliance.security.KeyServerEncryptionImpl" />
-	<bean id="keyServerDecryption" class="com.lithium.streams.compliance.security.KeyServerDecryptionImpl" />
 	<!-- Aspect -->
-	<bean id="encryption" class="com.lithium.streams.compliance.client.RealTimeEncryptionAspect" />
-	<bean id="decryption" class="com.lithium.streams.compliance.client.RealTimeDecryptionAspect" />
-
-	<bean id="iDecryption" class="com.lithium.streams.compliance.client.MessageDecryption" />
 
 	<bean id="keySourceComparator" class="com.lithium.streams.compliance.util.KeySourceComparator" />
 
-
-	<bean id="fixedSizeSortedSet" class="com.lithium.streams.compliance.util.FixedSizeSortedSet" lazy-init="true">
-		<property name="keySourceComparator" ref="keySourceComparator" />
-		<property name="cachedKeySourceLimit" value="2" />
+	<bean id="fixedSizeSortedSet" class="com.lithium.streams.compliance.util.FixedSizeSortedSet">
+		<constructor-arg ref="keySourceComparator" />
+		<constructor-arg name="cachedKeySourceLimit" value="2" />
 	</bean>
 
 	<bean id="keySourceUtil" class="com.lithium.streams.compliance.util.KeySourceUtil" lazy-init="true">
-		<property name="fixedSizeSortedSet" ref="fixedSizeSortedSet" />
+		<constructor-arg ref="fixedSizeSortedSet" />
+		<constructor-arg value="${turonOnEncryption}" />
 	</bean>
-
-
 </beans>

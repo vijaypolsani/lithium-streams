@@ -27,12 +27,6 @@ public class MessageDecryption implements IDecryption {
 		SecureEvent eventDecrypted = null;
 		Optional<KeySource> source = null;
 		try {
-			try {
-				source = keySourceUtil.getKeySource();
-			} catch (InterruptedException e) {
-				log.error("Exception in getting KeySource Object.");
-				e.printStackTrace();
-			}
 			eventDecrypted = keyServerDecryption.performMessageDecryption(secureEvent,
 					KeyServerProperties.COMMUNITY_NAME.getValue(), source.get());
 

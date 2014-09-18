@@ -7,7 +7,7 @@ import lithium.research.key.KeySource;
 
 public class KeySourceHolder {
 
-	private final long timeEpochMilli = Instant.now().toEpochMilli();
+	private final long timeEpochMilli = System.nanoTime();
 	private final Optional<KeySource> keysource;
 
 	public KeySourceHolder(Optional<KeySource> keySource) {
