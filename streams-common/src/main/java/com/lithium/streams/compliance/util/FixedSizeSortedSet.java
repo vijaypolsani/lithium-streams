@@ -18,9 +18,6 @@ import lithium.research.keys.ClientKeySource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.lithium.streams.compliance.exception.KeyServerFetchSecurityException;
-import com.lithium.streams.compliance.model.KeySourceHolder;
-
 public class FixedSizeSortedSet<KeySourceHolder> extends TreeSet<KeySourceHolder> {
 
 	private static final long serialVersionUID = 4133039913231315811L;
