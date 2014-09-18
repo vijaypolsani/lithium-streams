@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-3.2.xsd
+		 http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+	<aop:aspectj-autoproxy />
+	<context:property-placeholder location="classpath:/spring/config.properties" />
+
+	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
+
+	<!-- Definition for Compliance App Spring Service beans -->
+	<bean id="keyServerEncryption" class="com.lithium.streams.compliance.security.KeyServerEncryptionImpl" />
+	<bean id="keyServerDecryption" class="com.lithium.streams.compliance.security.KeyServerDecryptionImpl" />
+	<!-- Aspect -->
+	<bean id="encryption" class="com.lithium.streams.compliance.client.RealTimeEncryptionAspect" />
+	<bean id="decryption" class="com.lithium.streams.compliance.client.RealTimeDecryptionAspect" />
+
+	<bean id="iDecryption" class="com.lithium.streams.compliance.client.MessageDecryption" />
+
+	<bean id="keySourceComparator" class="com.lithium.streams.compliance.util.KeySourceComparator" />
+
+
+	<bean id="fixedSizeSortedSet" class="com.lithium.streams.compliance.util.FixedSizeSortedSet" lazy-init="true">
+		<property name="keySourceComparator" ref="keySourceComparator" />
+		<property name="cachedKeySourceLimit" value="2" />
+	</bean>
+
+	<bean id="keySourceUtil" class="com.lithium.streams.compliance.util.KeySourceUtil" lazy-init="true">
+		<property name="fixedSizeSortedSet" ref="fixedSizeSortedSet" />
+	</bean>
+
+
+</beans>
