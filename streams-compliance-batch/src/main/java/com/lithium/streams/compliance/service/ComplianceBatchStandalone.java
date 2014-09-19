@@ -2,9 +2,12 @@ package com.lithium.streams.compliance.service;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
+
+import lithium.research.key.KeySource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,18 +21,26 @@ import akka.util.Timeout;
 import com.lithium.streams.compliance.api.AbstractComplianceBatchService;
 import com.lithium.streams.compliance.api.ComplianceBatchEvents;
 import com.lithium.streams.compliance.consumer.KafkaSimpleConsumerFactory;
+import com.lithium.streams.compliance.exception.StreamsCommonSecurityException;
 import com.lithium.streams.compliance.filter.FilteringSystem;
 import com.lithium.streams.compliance.filter.Request;
 import com.lithium.streams.compliance.filter.Result;
 import com.lithium.streams.compliance.model.ComplianceMessage;
+import com.lithium.streams.compliance.model.SecureEvent;
+import com.lithium.streams.compliance.security.KeyServerDecryption;
+import com.lithium.streams.compliance.security.KeyServerProperties;
 import com.lithium.streams.compliance.util.BatchOperations;
 import com.lithium.streams.compliance.util.DateFormatter;
+import com.lithium.streams.compliance.util.KeySourceUtil;
 
 public class ComplianceBatchStandalone extends AbstractComplianceBatchService implements ComplianceBatchEvents {
 	private static final Logger log = LoggerFactory.getLogger(ComplianceBatchStandalone.class);
 	private static final int TIME_OUT = 10; // Sec
 	@Autowired
 	private FilteringSystem filteringSystem;
+
+	@Autowired
+	private KeyServerDecryption decryptEvent;
 
 	public ComplianceBatchStandalone(KafkaSimpleConsumerFactory kafkaSimpleConsumerFactory) {
 		super(kafkaSimpleConsumerFactory);

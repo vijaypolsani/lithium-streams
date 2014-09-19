@@ -6,20 +6,32 @@ import java.util.concurrent.Callable;
 
 import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
+import lithium.research.key.KeySource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.lithium.streams.compliance.beans.StreamEventBus;
-import com.lithium.streams.compliance.exception.ComplianceServiceException;
-import com.lithium.streams.compliance.model.LiaPostEvent;
+import com.lithium.streams.compliance.client.IDecryption;
+import com.lithium.streams.compliance.model.Payload;
+import com.lithium.streams.compliance.model.SecureEvent;
+import com.lithium.streams.compliance.security.KeyServerProperties;
+import com.lithium.streams.compliance.util.KeySourceUtil;
 
-public class ConsumerCallable implements Callable<List<String>> {
+public class ConsumerCallable implements Callable<List<byte[]>> {
 	private final KafkaStream<byte[], byte[]> kafkaStream;
 	private final int threadNumber;
 	private static final Logger log = LoggerFactory.getLogger(ConsumerCallable.class);
 	private Event lock;
 	private final StreamEventBus streamEventBus;
+
+	@Autowired
+	private IDecryption iDecryption;
+
+	@Autowired
+	private KeySourceUtil keySourceUtil;
+	private KeySource source = null;
 
 	public ConsumerCallable(KafkaStream<byte[], byte[]> stream, int threadNumber, Event lock,
 			StreamEventBus streamEventBus) {
@@ -29,17 +41,27 @@ public class ConsumerCallable implements Callable<List<String>> {
 		this.streamEventBus = streamEventBus;
 	}
 
-	public List<String> call() throws Exception {
+	public List<byte[]> call() throws Exception {
 		long counter = 0L;
-		final List<String> jsonContent = new ArrayList<String>();
+		final List<byte[]> jsonContent = new ArrayList<byte[]>();
 		ConsumerIterator<byte[], byte[]> it = kafkaStream.iterator();
 		//log.info("In Consumer Callable: " + it.hasNext());
 		while (it.hasNext()) {
 			synchronized (lock) {
-				lock.setJsonContent(new String(it.next().message()));
+				lock.setJsonContent(it.next().message());
 				log.info("Kafka Reader Thread Number: " + threadNumber + " *KC: =" + ++counter + " * Message Content: "
 						+ lock.getJsonContent());
+				//Unused Code. Cleanup
 				jsonContent.add(lock.getJsonContent());
+				//Decryption method call for enabling wrapping.
+				//TODO: Aspect based wrapping for Decryption.
+				if (keySourceUtil.isEncryptionTurnedOn()) {
+					if (source == null)
+						source = keySourceUtil.getKeySource().get();
+					SecureEvent decryptedEvent = iDecryption.performMessageDecryption(
+							new Payload(lock.getJsonContent()), KeyServerProperties.COMMUNITY_NAME.getValue(), source);
+					lock.setJsonContent(decryptedEvent.getMessage());
+				}
 				lock.notifyAll();
 				if (lock.getJsonContent() != null) {
 					try {

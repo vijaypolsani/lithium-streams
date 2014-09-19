@@ -18,6 +18,8 @@ import lithium.research.keys.ClientKeySource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.lithium.streams.compliance.security.KeyServerProperties;
+
 public class FixedSizeSortedSet<KeySourceHolder> extends TreeSet<KeySourceHolder> {
 
 	private static final long serialVersionUID = 4133039913231315811L;
@@ -35,11 +37,10 @@ public class FixedSizeSortedSet<KeySourceHolder> extends TreeSet<KeySourceHolder
 	public Optional<KeySource> createKeySource() {
 		Optional<KeySource> source = null;
 		try {
-			source = Optional.of(new ClientKeySource(URI.create(MockKeyServerProperties.URI_LINK.getValue()),
-					MockKeyServerProperties.EMAIL.getValue(), new SecretKeySpec(base16().decode(
-							MockKeyServerProperties.USER_KEY.getValue()), MockKeyServerProperties.AES.getValue()),
-					getClass().getProtectionDomain().getCodeSource().getLocation().getPath()
-							+ MockKeyServerProperties.HOST_KEY_PATH.getValue()));
+			source = Optional.of(new ClientKeySource(URI.create(KeyServerProperties.URI_LINK.getValue()),
+					KeyServerProperties.EMAIL.getValue(), new SecretKeySpec(base16().decode(
+							KeyServerProperties.USER_KEY.getValue()), KeyServerProperties.AES.getValue()),
+					KeyServerProperties.HOST_KEY_PATH.getValue()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

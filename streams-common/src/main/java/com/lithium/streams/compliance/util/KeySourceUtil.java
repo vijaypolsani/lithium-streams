@@ -1,27 +1,24 @@
 package com.lithium.streams.compliance.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.io.BaseEncoding.base16;
 
-import java.io.IOException;
-import java.net.URI;
 import java.util.Optional;
 
-import javax.crypto.spec.SecretKeySpec;
-
 import lithium.research.key.KeySource;
-import lithium.research.keys.ClientKeySource;
 
-import org.apache.commons.net.nntp.Threadable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.lithium.streams.compliance.exception.KeyServerFetchSecurityException;
 import com.lithium.streams.compliance.model.KeySourceHolder;
 
 public class KeySourceUtil {
 	private final FixedSizeSortedSet<KeySourceHolder> fixedSizeSortedSet;
-	private final Boolean turonOnEncryption;
+	private final boolean turonOnEncryption;
+
+	public boolean isEncryptionTurnedOn() {
+		return turonOnEncryption;
+	}
+
 	private static final Logger log = LoggerFactory.getLogger(KeySourceUtil.class);
 
 	public KeySourceUtil(FixedSizeSortedSet<KeySourceHolder> fixedSizeSortedSet, boolean turonOnEncryption) {
@@ -48,10 +45,11 @@ public class KeySourceUtil {
 	}
 
 	public Optional<KeySource> getKeySource() {
-		if (!turonOnEncryption.booleanValue()) {
-			log.info("Encryption is tuned OFF. So no keySource in the store.");
+		if (!turonOnEncryption) {
+			log.info("Encryption is tuned OFF. No keySource in the store. Please turn the bean configuration to TRUE");
 			return Optional.empty();
 		}
+		log.info(">>> Calling Util backend DS for keySource in the store.");
 		return fixedSizeSortedSet.getKeySource();
 	}
 

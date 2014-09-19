@@ -1,20 +1,15 @@
 package com.lithium.streams.compliance.consumer;
 
-public class Event {
-	private String jsonContent = null;
 
-	/**
-	 * @return the jsonContent
-	 */
-	public String getJsonContent() {
-		return jsonContent;
+public class Event {
+	private byte[] jsonContent;
+
+	public void setJsonContent(byte[] jsonContent) {
+		this.jsonContent = jsonContent;
 	}
 
-	/**
-	 * @param jsonContent the jsonContent to set
-	 */
-	public void setJsonContent(String jsonContent) {
-		this.jsonContent = jsonContent;
+	public byte[] getJsonContent() {
+		return jsonContent;
 	}
 
 	@Override

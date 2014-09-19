@@ -24,7 +24,7 @@ public interface MessageFilteringService {
 	public static final Calendar cal = Calendar.getInstance();
 	public static final String SAMPLE_INPUT = "{\"formatVersion\":\"1.0\",\"published\":\"1403887363553\",\"generator\":{\"source\":\"actiance.stage\",\"eventId\":\"3842328\"},\"provider\":{\"service\":\"lia\",\"version\":\"14.6.6\"},\"title\":\"EntityUpdated\",\"actor\":{\"uid\":\"1\",\"login\":\"admin\",\"registrationStatus\":\"FULLY_REGISTERED\",\"email\":\"admin@lithium.com\",\"type\":\"user\",\"registrationTime\":\"1402004942097\"},\"verb\":\"EntityUpdated user\",\"target\":{\"type\":\"user\",\"conversationType\":\"\",\"id\":\"1\",\"conversationId\":\"\"},\"streamObject\":{\"objectType\":\"\",\"id\":\"\",\"displayName\":\"\",\"content\":\"\",\"visibility\":\"\",\"subject\":\"\",\"added\":\"\",\"postTime\":\"\",\"isTopic\":\"false\"}}";
 
-	public static boolean filterByTime(final String inputJsonStream, final long startTime, final long endTime)
+	public static boolean filterByTime(final byte[] inputJsonStream, final long startTime, final long endTime)
 			throws IOException {
 		jsonFactory.enable(Feature.ALLOW_COMMENTS);
 		jsonFactory.enable(Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER);
@@ -84,7 +84,7 @@ public interface MessageFilteringService {
 		return source;
 	}
 
-	public default boolean filterBySequenceId(String inputJsonStream, long startId, long endId) throws IOException {
+	public default boolean filterBySequenceId(byte[] inputJsonStream, long startId, long endId) throws IOException {
 		throw new UnsupportedOperationException("SequenceID based querying not supported in this release.");
 	}
 }

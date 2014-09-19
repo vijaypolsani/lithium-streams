@@ -26,7 +26,7 @@ public class JsonFormatToArray {
 		String returnData = "";
 		List<String> events = new ArrayList<String>();
 		for (ComplianceEvent msg : messages)
-			events.add(msg.getEventPayload().getJsonMessage());
+			events.add(new String(msg.getEventPayload().getJsonMessage()));
 		try {
 			returnData = mapper.writeValueAsString(events.toArray());
 		} catch (JsonProcessingException e) {

@@ -2,12 +2,8 @@ package com.lithium.streams.compliance.consumer;
 
 import java.util.concurrent.ExecutionException;
 
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.lithium.streams.compliance.beans.ConsumeEventsServiceImpl;
 import com.lithium.streams.compliance.beans.StreamEventBus;
@@ -36,7 +32,8 @@ public class ConsumeMessages extends Thread {
 						+ consumerGroup.getLock().getJsonContent());
 				if (consumerGroup.getLock().getJsonContent() != null) {
 					try {
-						streamEventBus.postEvent(new LiaPostEvent(consumerGroup.getLock().getJsonContent()));
+						streamEventBus
+								.postEvent(new LiaPostEvent(new String(consumerGroup.getLock().getJsonContent())));
 					} catch (ComplianceServiceException cs) {
 						throw new ComplianceServiceException("LI002", "Unregistred the listener. Reregister.", cs);
 					}

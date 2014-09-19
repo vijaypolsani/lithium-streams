@@ -26,7 +26,7 @@ public class FilterMessagesImpl implements FilterMessages {
 	public Collection<ComplianceMessage> receiveMessages(Collection<ComplianceMessage> unfilteredMessages,
 			long startTime, long endTime) {
 		log.info(">>>Typed Actor, Calling FilterSystem: ");
-		Timeout timeout = new Timeout(Duration.create(5, "seconds"));
+		Timeout timeout = new Timeout(Duration.create(60, "seconds"));
 
 		Future<Object> future = Patterns.ask(filteringSystem.getMaster(), new Request(unfilteredMessages, startTime,
 				endTime), timeout);

@@ -38,7 +38,7 @@ public class FilterSystemTest {
 		Collection<ComplianceMessage> messages = new ArrayList<>();
 		for (int i = 0; i < 10000; i++) {
 			ComplianceMessage msg = ComplianceMessage.MsgBuilder.init("junit" + i).payload(
-					CompliancePayload.init(MessageFilteringService.SAMPLE_INPUT)).build();
+					CompliancePayload.init(MessageFilteringService.SAMPLE_INPUT.getBytes())).build();
 			messages.add(msg);
 		}
 		Timeout timeout = new Timeout(Duration.create(5, "seconds"));

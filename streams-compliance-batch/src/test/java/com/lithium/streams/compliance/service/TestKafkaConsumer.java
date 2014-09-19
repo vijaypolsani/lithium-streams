@@ -21,7 +21,7 @@ import org.springframework.util.Assert;
 import com.lithium.streams.compliance.model.ComplianceMessage;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:./spring/appContext.xml")
+@ContextConfiguration("classpath:./spring/batchContext.xml")
 @ActiveProfiles("dev")
 public class TestKafkaConsumer {
 

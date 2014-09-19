@@ -61,7 +61,7 @@ public class AppConfiguration extends ResourceConfig {
 
 		// Setup context listener
 		context.addEventListener(new org.springframework.web.context.ContextLoaderListener());
-		context.setInitParameter("contextConfigLocation", "classpath*:/spring/appContext.xml");
+		context.setInitParameter("contextConfigLocation", "classpath*:/spring/batchContext.xml");
 
 		// Add REST Servlet
 		context.addServlet(new ServletHolder(new ServletContainer(new AppConfiguration())), "/compliance/*");

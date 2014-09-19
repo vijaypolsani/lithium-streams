@@ -14,7 +14,7 @@ public class LiaPostEvent implements ComplianceEvent {
 
 	@Override
 	public String toString() {
-		return "LiaPostEvent [liaPostContent=" + liaPostContent + "]";
+		return "LiaPostEvent [liaPostContent=" + new String(liaPostContent) + "]";
 	}
 
 }

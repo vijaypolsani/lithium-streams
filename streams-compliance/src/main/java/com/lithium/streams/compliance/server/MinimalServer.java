@@ -39,7 +39,6 @@ import com.lithium.streams.compliance.util.ListOfSpringBeans;
 
 public class MinimalServer {
 
-	private static final Logger log = LoggerFactory.getLogger(MinimalServer.class);
 	private static final MetricRegistry registry = new MetricRegistry();
 	private static final HealthCheckRegistry healthCheckRegistry = new HealthCheckRegistry();
 	private static final ExecutorService threadPoolExecutors = Executors.newCachedThreadPool();
@@ -82,7 +81,7 @@ public class MinimalServer {
 
 		// Setup context listener
 		context.addEventListener(new org.springframework.web.context.ContextLoaderListener());
-		context.setInitParameter("contextConfigLocation", "classpath*:/spring/appContext.xml");
+		context.setInitParameter("contextConfigLocation", "classpath*:/spring/realTimeContext.xml");
 
 		// Add REST Servlet
 		context.addServlet(sh, "/compliance/*");

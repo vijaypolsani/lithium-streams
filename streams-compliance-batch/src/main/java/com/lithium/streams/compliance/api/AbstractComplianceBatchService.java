@@ -20,12 +20,14 @@ import kafka.javaapi.TopicMetadataRequest;
 import kafka.javaapi.TopicMetadataResponse;
 import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.message.MessageAndOffset;
+import lithium.research.key.KeySource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
+import com.lithium.streams.compliance.client.IDecryption;
 import com.lithium.streams.compliance.consumer.EnumKafkaProperties;
 import com.lithium.streams.compliance.consumer.KafkaSimpleConsumerFactory;
 import com.lithium.streams.compliance.consumer.SimpleConsumerPool;
@@ -33,8 +35,14 @@ import com.lithium.streams.compliance.handler.ComplainceHandlerProcessor;
 import com.lithium.streams.compliance.model.ComplianceHeader;
 import com.lithium.streams.compliance.model.ComplianceMessage;
 import com.lithium.streams.compliance.model.CompliancePayload;
+import com.lithium.streams.compliance.model.Payload;
+import com.lithium.streams.compliance.model.SecureEvent;
+import com.lithium.streams.compliance.security.KeyServerProperties;
 import com.lithium.streams.compliance.service.ComplianceContext;
 import com.lithium.streams.compliance.util.BatchOperations;
+import com.lithium.streams.compliance.util.FixedSizeSortedSet;
+import com.lithium.streams.compliance.util.KeySourceComparator;
+import com.lithium.streams.compliance.util.KeySourceUtil;
 
 public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi {
 
@@ -47,6 +55,14 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 
 	@Autowired
 	private ComplainceHandlerProcessor complainceHandlerProcessor;
+
+	@Autowired
+	private IDecryption iDecryption;
+
+	@Autowired
+	private KeySourceUtil keySourceUtil;
+
+	private KeySource source = null;
 
 	public AbstractComplianceBatchService(KafkaSimpleConsumerFactory kafkaSimpleConsumerFactory) {
 		topicList.add(EnumKafkaProperties.TOPIC_ACTIANCE.getKafkaProperties());
@@ -174,9 +190,31 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 			ByteBuffer payload = messageAndOffset.message().payload();
 			byte[] bytes = new byte[payload.limit()];
 			payload.get(bytes);
-			CompliancePayload compliancePayload = CompliancePayload.init(new String(bytes, "UTF-8"));
+
+			//Decryption method call for enabling wrapping.
+			//TODO: Aspect based wrapping for Decryption.
+			SecureEvent decryptedEvent = null;
+			CompliancePayload compliancePayload = null;
+
+			if (keySourceUtil.isEncryptionTurnedOn()) {
+				if (source == null)
+				{
+					log.info("****:" + keySourceUtil);
+					source = keySourceUtil.getKeySource().get();
+				}
+				decryptedEvent = iDecryption.performMessageDecryption(new Payload(bytes),
+						KeyServerProperties.COMMUNITY_NAME.getValue(), source);
+			}
+			if (decryptedEvent != null)
+				compliancePayload = CompliancePayload.init(decryptedEvent.getMessage());
+			else
+				compliancePayload = CompliancePayload.init(bytes);
+
+			//End of decryption call.
+
 			log.debug(">>> Offset:Data: " + String.valueOf(messageAndOffset.offset()) + ": "
 					+ compliancePayload.getJsonMessage());
+
 			final ComplianceMessage complianceMessage = ComplianceMessage.MsgBuilder.init(
 					contex.getTopicName() + ":" + messageAndOffset.offset()).header(
 					ComplianceHeader.HeaderBuilder.init(System.currentTimeMillis()).communityId(contex.getTopicName())
@@ -189,6 +227,7 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 			//TODO: Future specific filtering needs.
 			complainceHandlerProcessor.processChain(complianceMessage);
 			log.debug(">>> Completed Processor Chain Calls. Time ms: " + (System.currentTimeMillis() - start));
+			//Decryption method call for enabling wrapping.
 			returnMessages.add(complianceMessage);
 			//End Filtering Service.
 		}

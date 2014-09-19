@@ -90,6 +90,7 @@ public class ComplianceService {
 				this.listenerName = listenerClientName;
 			}
 
+			@SuppressWarnings("unused")
 			@Subscribe
 			@AllowConcurrentEvents
 			public void readEvents(ComplianceEvent complianceEvent) {
