@@ -2,6 +2,7 @@ package com.lithium.streams.compliance.util;
 
 import static com.google.common.io.BaseEncoding.base16;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
@@ -18,6 +19,7 @@ import lithium.research.keys.ClientKeySource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.lithium.streams.compliance.exception.HostKeyNotFoundSecurityException;
 import com.lithium.streams.compliance.security.KeyServerProperties;
 
 public class FixedSizeSortedSet<KeySourceHolder> extends TreeSet<KeySourceHolder> {
@@ -41,8 +43,13 @@ public class FixedSizeSortedSet<KeySourceHolder> extends TreeSet<KeySourceHolder
 					KeyServerProperties.EMAIL.getValue(), new SecretKeySpec(base16().decode(
 							KeyServerProperties.USER_KEY.getValue()), KeyServerProperties.AES.getValue()),
 					KeyServerProperties.HOST_KEY_PATH.getValue()));
+		} catch (FileNotFoundException fe) {
+			fe.printStackTrace();
+			throw new HostKeyNotFoundSecurityException("HostKey not found. Please check file location."
+					+ fe.getLocalizedMessage());
 		} catch (IOException e) {
 			e.printStackTrace();
+			return source.empty();
 		}
 		return source;
 	}

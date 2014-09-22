@@ -9,6 +9,7 @@ import lithium.research.key.KeySource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.lithium.streams.compliance.exception.HostKeyNotFoundSecurityException;
 import com.lithium.streams.compliance.model.KeySourceHolder;
 
 public class KeySourceUtil {
@@ -30,7 +31,12 @@ public class KeySourceUtil {
 	private void initializeKeySourceStash() {
 		log.info(">>>Initializing the KeySource Store: Limit = " + fixedSizeSortedSet.getCachedKeySourceLimit());
 		for (int i = fixedSizeSortedSet.getCachedKeySourceLimit(); i > 0; i--) {
-			add(new KeySourceHolder(fixedSizeSortedSet.createKeySource()));
+			try {
+				add(new KeySourceHolder(fixedSizeSortedSet.createKeySource()));
+			} catch (HostKeyNotFoundSecurityException hke) {
+				log.error("Initialization Failed." + hke.getLocalizedMessage());
+				break;
+			}
 		}
 		fixedSizeSortedSet.printCollection();
 	}

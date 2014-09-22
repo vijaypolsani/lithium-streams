@@ -7,15 +7,20 @@
 		<artifactId>lithium-streams</artifactId>
 		<version>0.0.1</version>
 	</parent>
-	<groupId>com.lithium.integrations</groupId>
 	<artifactId>streams-compliance-batch</artifactId>
 	<version>0.0.1</version>
-	<name>streams-compliance</name>
+	<name>streams-compliance-batch</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencies>
+	
+		<dependency>
+			<groupId>com.lithium.integrations</groupId>
+			<artifactId>streams-common</artifactId>
+			<version>0.0.1</version>
+		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.ext</groupId>
 			<artifactId>jersey-spring3</artifactId>
