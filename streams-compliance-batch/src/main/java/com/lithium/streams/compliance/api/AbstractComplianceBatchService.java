@@ -31,6 +31,7 @@ import com.lithium.streams.compliance.client.IDecryption;
 import com.lithium.streams.compliance.consumer.EnumKafkaProperties;
 import com.lithium.streams.compliance.consumer.KafkaSimpleConsumerFactory;
 import com.lithium.streams.compliance.consumer.SimpleConsumerPool;
+import com.lithium.streams.compliance.exception.StreamsCommonSecurityException;
 import com.lithium.streams.compliance.handler.ComplainceHandlerProcessor;
 import com.lithium.streams.compliance.model.ComplianceHeader;
 import com.lithium.streams.compliance.model.ComplianceMessage;
@@ -62,7 +63,7 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 	@Autowired
 	private KeySourceUtil keySourceUtil;
 
-	private KeySource source = null;
+	private KeySource keySource = null;
 
 	public AbstractComplianceBatchService(KafkaSimpleConsumerFactory kafkaSimpleConsumerFactory) {
 		topicList.add(EnumKafkaProperties.TOPIC_ACTIANCE.getKafkaProperties());
@@ -193,23 +194,17 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 
 			//Decryption method call for enabling wrapping.
 			//TODO: Aspect based wrapping for Decryption.
-			SecureEvent decryptedEvent = null;
-			CompliancePayload compliancePayload = null;
-
-			if (keySourceUtil.isEncryptionTurnedOn()) {
-				if (source == null)
-				{
-					log.info("****:" + keySourceUtil);
-					source = keySourceUtil.getKeySource().get();
-				}
-				decryptedEvent = iDecryption.performMessageDecryption(new Payload(bytes),
-						KeyServerProperties.COMMUNITY_NAME.getValue(), source);
+			final CompliancePayload compliancePayload;
+			if (keySourceUtil.isEncryptionTurnedOn() && keySource == null) {
+				keySource = keySourceUtil.getKeySource().get();
+				log.info(">>> Got KeySource from KeySourceUtil: " + keySource);
 			}
-			if (decryptedEvent != null)
+			if (keySourceUtil.isEncryptionTurnedOn()) {
+				SecureEvent decryptedEvent = iDecryption.performMessageDecryption(new Payload(bytes),
+						KeyServerProperties.COMMUNITY_NAME.getValue(), keySource);
 				compliancePayload = CompliancePayload.init(decryptedEvent.getMessage());
-			else
+			} else
 				compliancePayload = CompliancePayload.init(bytes);
-
 			//End of decryption call.
 
 			log.debug(">>> Offset:Data: " + String.valueOf(messageAndOffset.offset()) + ": "

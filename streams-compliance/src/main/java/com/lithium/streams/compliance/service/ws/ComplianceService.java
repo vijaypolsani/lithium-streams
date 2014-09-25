@@ -61,8 +61,6 @@ public class ComplianceService {
 	 */
 	@GET
 	@Path("live")
-	//@Path("live/{communityName}")
-	//@Produces(MediaType.APPLICATION_JSON)
 	@Produces(SseFeature.SERVER_SENT_EVENTS)
 	@Timed
 	@Metered
@@ -70,8 +68,7 @@ public class ComplianceService {
 	public EventOutput getLiveEvents(@HeaderParam("client-id") String clientId) throws InterruptedException,
 			ExecutionException {
 
-		//TODO:
-		// Ideally I want to create a new ConsumerGroup for every Customer Login name. I can keep the thread or discard. 
+		//TODO: Ideally I want to create a new ConsumerGroup for every Customer Login name. I can keep the thread or discard. 
 
 		log.info(">>> In Compliance Service. Header client-id: " + clientId);
 		if (clientId == null || !(clientId.equals(PASSCODE))) {

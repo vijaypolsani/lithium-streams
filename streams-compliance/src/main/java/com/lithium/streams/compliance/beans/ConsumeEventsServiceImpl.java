@@ -6,13 +6,17 @@ import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
+import lithium.research.key.KeySource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.lithium.streams.compliance.client.IDecryption;
 import com.lithium.streams.compliance.consumer.ConsumeMessages;
+import com.lithium.streams.compliance.util.KeySourceUtil;
 import com.lithium.streams.compliance.util.StreamEventBusListener;
 
 public class ConsumeEventsServiceImpl implements ConsumeEventsService {
@@ -24,9 +28,14 @@ public class ConsumeEventsServiceImpl implements ConsumeEventsService {
 
 	@Inject
 	private StreamCache streamCache;
-
 	@Inject
 	private StreamEventBus streamEventBus;
+	@Inject
+	private KeySourceUtil keySourceUtil;
+	@Inject
+	private IDecryption iDecryption;
+
+	private KeySource keySource = null;
 
 	private ConsumeMessages consumeMessages = null;
 
@@ -44,14 +53,25 @@ public class ConsumeEventsServiceImpl implements ConsumeEventsService {
 		String groupId = communityName + login;
 		log.info(">>> StreamCache Constructed, Check for NULL ? : " + streamCache.hashCode());
 		consumeMessages = streamCache.getCache().getIfPresent(groupId);
+
 		if (consumeMessages == null) {
 			log.info(">>> No Cache Thread *NOT FOUND* for GroupID: " + groupId);
-			consumeMessages = new ConsumeMessages(groupId, ZK_HOSTNAME_URL, ZK_TIMEOUT, communityName, groupId,
-					streamEventBus);
+
+			if (keySourceUtil.isEncryptionTurnedOn()) {
+				log.info(">>> Decryption is needed for GroupID: " + groupId);
+				if (keySource == null)
+					keySource = keySourceUtil.getKeySource().get();
+				log.info(">>> Decryption KeySource GroupID: " + keySource);
+				consumeMessages = new ConsumeMessages(groupId, ZK_HOSTNAME_URL, ZK_TIMEOUT, communityName, groupId,
+						streamEventBus, iDecryption, keySource);
+			} else {
+				consumeMessages = new ConsumeMessages(groupId, ZK_HOSTNAME_URL, ZK_TIMEOUT, communityName, groupId,
+						streamEventBus);
+			}
 			consumeMessages.start();
 			streamCache.getCache().put(groupId, consumeMessages);
 		}
-		log.info(">>> Cache Thread *FOUND* for GroupID: " + groupId + " HadhCode: " + streamCache.hashCode()
+		log.info(">>> Cache Thread *FOUND* for GroupID: " + groupId + " HashCode: " + streamCache.hashCode()
 				+ "Stats: " + streamCache.getCache().stats().toString());
 	}
 

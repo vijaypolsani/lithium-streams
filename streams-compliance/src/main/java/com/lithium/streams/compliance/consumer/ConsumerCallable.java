@@ -26,13 +26,6 @@ public class ConsumerCallable implements Callable<List<byte[]>> {
 	private Event lock;
 	private final StreamEventBus streamEventBus;
 
-	@Autowired
-	private IDecryption iDecryption;
-
-	@Autowired
-	private KeySourceUtil keySourceUtil;
-	private KeySource source = null;
-
 	public ConsumerCallable(KafkaStream<byte[], byte[]> stream, int threadNumber, Event lock,
 			StreamEventBus streamEventBus) {
 		this.threadNumber = threadNumber;
@@ -49,19 +42,7 @@ public class ConsumerCallable implements Callable<List<byte[]>> {
 		while (it.hasNext()) {
 			synchronized (lock) {
 				lock.setJsonContent(it.next().message());
-				log.info("Kafka Reader Thread Number: " + threadNumber + " *KC: =" + ++counter + " * Message Content: "
-						+ lock.getJsonContent());
-				//Unused Code. Cleanup
-				jsonContent.add(lock.getJsonContent());
-				//Decryption method call for enabling wrapping.
-				//TODO: Aspect based wrapping for Decryption.
-				if (keySourceUtil.isEncryptionTurnedOn()) {
-					if (source == null)
-						source = keySourceUtil.getKeySource().get();
-					SecureEvent decryptedEvent = iDecryption.performMessageDecryption(
-							new Payload(lock.getJsonContent()), KeyServerProperties.COMMUNITY_NAME.getValue(), source);
-					lock.setJsonContent(decryptedEvent.getMessage());
-				}
+				log.info("Kafka Reader Thread Number: " + threadNumber + " *KC: =" + ++counter);
 				lock.notifyAll();
 				if (lock.getJsonContent() != null) {
 					try {

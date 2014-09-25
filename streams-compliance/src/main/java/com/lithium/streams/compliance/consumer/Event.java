@@ -2,7 +2,7 @@ package com.lithium.streams.compliance.consumer;
 
 
 public class Event {
-	private byte[] jsonContent;
+	private byte[] jsonContent = null;
 
 	public void setJsonContent(byte[] jsonContent) {
 		this.jsonContent = jsonContent;

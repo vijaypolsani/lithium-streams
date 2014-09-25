@@ -27,6 +27,6 @@
 
 	<bean id="keySourceUtil" class="com.lithium.streams.compliance.util.KeySourceUtil">
 		<constructor-arg ref="fixedSizeSortedSet" />
-		<constructor-arg name="turonOnEncryption" value="false" />
+		<constructor-arg name="turonOnEncryption" value="true" />
 	</bean>
 </beans>
