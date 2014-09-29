@@ -17,11 +17,11 @@
 
 	<bean id="fixedSizeSortedSet" class="com.lithium.streams.compliance.util.FixedSizeSortedSet">
 		<constructor-arg ref="keySourceComparator" />
-		<constructor-arg name="cachedKeySourceLimit" value="2" value type="int" />
+		<constructor-arg name="cachedKeySourceLimit" value="1" value type="int" />
 	</bean>
 
 	<bean id="keySourceUtil" class="com.lithium.streams.compliance.util.KeySourceUtil" lazy-init="true">
 		<constructor-arg ref="fixedSizeSortedSet" />
-		<constructor-arg name="turonOnEncryption" value="true" />
+		<constructor-arg name="turonOnEncryption" value="false" />
 	</bean>
 </beans>

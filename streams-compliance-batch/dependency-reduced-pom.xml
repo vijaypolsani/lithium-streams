@@ -6,9 +6,8 @@
     <version>0.0.1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.lithium.integrations</groupId>
   <artifactId>streams-compliance-batch</artifactId>
-  <name>streams-compliance</name>
+  <name>streams-compliance-batch</name>
   <version>0.0.1</version>
   <url>http://maven.apache.org</url>
   <build>
