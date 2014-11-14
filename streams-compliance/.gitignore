@@ -3,3 +3,7 @@
 /.classpath
 /.project
 /bin/
+/dependency-reduced-pom.xml
+/keystore.jks
+/log4j.properties
+/.gitignore

@@ -25,7 +25,11 @@ public class SimpleConsumerFactoryTest {
 		config.setMaxTotal(1);
 		config.setTestOnBorrow(true);
 		config.setTestOnReturn(true);
-		simpleConsumerPool = new SimpleConsumerPool(new SimpleConsumerFactory(), config);
+		simpleConsumerPool = new SimpleConsumerPool(new SimpleConsumerFactory(EnumKafkaProperties.CLIENT_NAME
+				.getKafkaProperties(), EnumKafkaProperties.BROKER.getKafkaProperties(), Integer
+				.parseInt(EnumKafkaProperties.MESSAGE_SIZE.getKafkaProperties()), Integer
+				.parseInt(EnumKafkaProperties.BUFFER_SIZE.getKafkaProperties()), Integer
+				.parseInt(EnumKafkaProperties.BROKER_PORT.getKafkaProperties())), config);
 	}
 
 	@Test

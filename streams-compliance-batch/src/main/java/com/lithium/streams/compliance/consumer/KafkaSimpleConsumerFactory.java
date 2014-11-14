@@ -12,7 +12,11 @@ public class KafkaSimpleConsumerFactory {
 		genericObjectPoolConfig.setMaxTotal(10);
 		genericObjectPoolConfig.setTestOnBorrow(true);
 		genericObjectPoolConfig.setTestOnReturn(true);
-		simpleConsumerPool = new SimpleConsumerPool(new SimpleConsumerFactory(), genericObjectPoolConfig);
+		simpleConsumerPool = new SimpleConsumerPool(new SimpleConsumerFactory(EnumKafkaProperties.CLIENT_NAME
+				.getKafkaProperties(), EnumKafkaProperties.BROKER.getKafkaProperties(), Integer
+				.parseInt(EnumKafkaProperties.MESSAGE_SIZE.getKafkaProperties()), Integer
+				.parseInt(EnumKafkaProperties.BUFFER_SIZE.getKafkaProperties()), Integer
+				.parseInt(EnumKafkaProperties.BROKER_PORT.getKafkaProperties())), genericObjectPoolConfig);
 	}
 
 	public SimpleConsumerPool getPool() {

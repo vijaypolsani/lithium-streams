@@ -2,3 +2,10 @@
 /.settings/
 /.classpath
 /.project
+/AngularUI.png
+/config.properties
+/dependency-reduced-pom.xml
+/jetty-2014_09_19.request.log
+/keystore.jks
+/log4j.properties
+/.gitignore

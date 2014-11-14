@@ -8,13 +8,23 @@ import org.apache.commons.pool2.impl.DefaultPooledObject;
 
 public class SimpleConsumerFactory extends BasePooledObjectFactory<SimpleConsumer> {
 
+	private final String clientName;
+	private final String brokerName;
+	private final int port;
+	private final int messageSize;
+	private final int bufferSize;
+
+	public SimpleConsumerFactory(String clientName, String brokerName, int port, int messageSize, int bufferSize) {
+		this.clientName = clientName;
+		this.brokerName = brokerName;
+		this.port = port;
+		this.messageSize = messageSize;
+		this.bufferSize = bufferSize;
+	}
+
 	@Override
 	public SimpleConsumer create() throws Exception {
-		return new SimpleConsumer(EnumKafkaProperties.BROKER.getKafkaProperties(), Integer
-				.parseInt(EnumKafkaProperties.BROKER_PORT.getKafkaProperties()), Integer
-				.parseInt(EnumKafkaProperties.MESSAGE_SIZE.getKafkaProperties()), Integer
-				.parseInt(EnumKafkaProperties.BUFFER_SIZE.getKafkaProperties()), EnumKafkaProperties.CLIENT_NAME
-				.getKafkaProperties());
+		return new SimpleConsumer(brokerName, port, messageSize, bufferSize, clientName);
 	}
 
 	@Override

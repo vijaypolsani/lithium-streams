@@ -1,10 +1,5 @@
 package com.lithium.streams.compliance.model;
 
-/**
- * Version ActivityStreams representation in Java. TODO Might be replaced to AVRO/protoBuf later.
- * 
- * @author megha.meshram
- */
 public class ActivityStreamV1 {
 
 	private final String formatVersion = "1.0";
