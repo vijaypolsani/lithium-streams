@@ -35,6 +35,18 @@
 					<artifactId>ring-devel</artifactId>
 					<groupId>ring</groupId>
 				</exclusion>
+				<exclusion>
+					<artifactId>hiccup</artifactId>
+					<groupId>hiccup</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>ring-jetty-adapter</artifactId>
+					<groupId>ring</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>carbonite</artifactId>
+					<groupId>com.twitter</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
