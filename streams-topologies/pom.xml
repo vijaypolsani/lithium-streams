@@ -18,6 +18,24 @@
 			<groupId>org.apache.storm</groupId>
 			<artifactId>storm-core</artifactId>
 			<version>0.9.2-incubating</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>clj-time</artifactId>
+					<groupId>clj-time</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>compojure</artifactId>
+					<groupId>compojure</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>ring-core</artifactId>
+					<groupId>ring</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>ring-devel</artifactId>
+					<groupId>ring</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
