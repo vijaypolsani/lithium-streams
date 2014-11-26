@@ -27,13 +27,15 @@ public class FixedSizeSortedSet<KeySourceHolder> extends TreeSet<KeySourceHolder
 	private static final long serialVersionUID = 4133039913231315811L;
 	private final Comparator<KeySourceHolder> comparator;
 	private final int cachedKeySourceLimit;
+	private final String hostKeyLocation;
 
 	private static final Logger log = LoggerFactory.getLogger(FixedSizeSortedSet.class);
 
-	public FixedSizeSortedSet(Comparator<KeySourceHolder> comparator, int cachedKeySourceLimit) {
+	public FixedSizeSortedSet(Comparator<KeySourceHolder> comparator, int cachedKeySourceLimit, String hostKeyLocation) {
 		super(Collections.synchronizedSortedSet(new TreeSet<KeySourceHolder>(comparator)));
 		this.comparator = comparator;
 		this.cachedKeySourceLimit = cachedKeySourceLimit;
+		this.hostKeyLocation = hostKeyLocation;
 	}
 
 	public Optional<KeySource> createKeySource() {
@@ -42,7 +44,7 @@ public class FixedSizeSortedSet<KeySourceHolder> extends TreeSet<KeySourceHolder
 			source = Optional.of(new ClientKeySource(URI.create(KeyServerProperties.URI_LINK.getValue()),
 					KeyServerProperties.EMAIL.getValue(), new SecretKeySpec(base16().decode(
 							KeyServerProperties.USER_KEY.getValue()), KeyServerProperties.AES.getValue()),
-					KeyServerProperties.HOST_KEY_PATH.getValue()));
+					hostKeyLocation));
 		} catch (FileNotFoundException fe) {
 			fe.printStackTrace();
 			throw new HostKeyNotFoundSecurityException("HostKey not found. Please check file location."

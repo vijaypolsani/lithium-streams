@@ -34,7 +34,7 @@ public class TestIDecryption {
 
 	private KeyServerDecryption decryptEvent = new KeyServerDecryptionImpl();
 
-	private KeySourceUtil keySourceUtil = new KeySourceUtil(new FixedSizeSortedSet(new KeySourceComparator(), 2), true);
+	private KeySourceUtil keySourceUtil = new KeySourceUtil(new FixedSizeSortedSet(new KeySourceComparator(), 1, "/Users/vijay.polsani/temp/host.key"), true);
 
 	private IDecryption iDecryption = new MessageDecryption();
 

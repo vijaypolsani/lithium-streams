@@ -35,22 +35,21 @@ public class MessageEncryption implements IEncryption {
 
 	private static final Logger log = LoggerFactory.getLogger(MessageEncryption.class);
 
+	@Override
 	public SecureEvent performMessageEncryption(final SecureEvent secureEvent, final String communityName,
 			final KeySource source) {
-		final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		EncryptStreamer encryptStreamer = new EncryptStreamer(Configs.empty(), source);
-		OutputStream outputStream;
 		try {
-			outputStream = encryptStreamer.filterOut(byteArrayOutputStream, KeyServerProperties.COMMUNITY_NAME
-					.getValue());
+			final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+			EncryptStreamer encryptStreamer = new EncryptStreamer(Configs.empty(), source);
+			OutputStream outputStream = encryptStreamer.filterOut(byteArrayOutputStream,
+					KeyServerProperties.COMMUNITY_NAME.getValue());
 			IOUtils.write(secureEvent.getMessage(), outputStream);
 			IOUtils.closeQuietly(outputStream);
-			log.debug(">>>CommunityEncryptEvent completed: " + byteArrayOutputStream.toByteArray());
+			return new Payload(byteArrayOutputStream.toByteArray());
 		} catch (IOException e) {
 			e.printStackTrace();
 			log.error("<<< Encryption failed : " + e.getLocalizedMessage());
+			return secureEvent;
 		}
-		return new Payload(byteArrayOutputStream.toByteArray());
-
 	}
 }

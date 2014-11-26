@@ -6,22 +6,29 @@
 		 http://www.springframework.org/schema/aop
         http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
 	<aop:aspectj-autoproxy />
-	<context:property-placeholder location="classpath:/spring/config.properties" />
+	<context:property-placeholder location="classpath:/spring/config-local.properties" />
 
 	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
 
 	<!-- Definition for Compliance App Spring Service beans -->
+	<bean id="keyServerEncryption" class="com.lithium.streams.compliance.security.KeyServerEncryptionImpl" />
+	<bean id="keyServerDecryption" class="com.lithium.streams.compliance.security.KeyServerDecryptionImpl" />
 	<!-- Aspect -->
+	<!-- <bean id="realTimeEncryption" class="com.lithium.streams.compliance.client.RealTimeEncryptionAspect" /> <bean id="realTimeDecryption" 
+		class="com.lithium.streams.compliance.client.RealTimeDecryptionAspect" /> -->
+	<bean id="iEncryption" class="com.lithium.streams.compliance.client.MessageEncryption" />
+	<bean id="iDecryption" class="com.lithium.streams.compliance.client.MessageDecryption" />
 
 	<bean id="keySourceComparator" class="com.lithium.streams.compliance.util.KeySourceComparator" />
 
 	<bean id="fixedSizeSortedSet" class="com.lithium.streams.compliance.util.FixedSizeSortedSet">
 		<constructor-arg ref="keySourceComparator" />
-		<constructor-arg name="cachedKeySourceLimit" value="1" value type="int" />
+		<constructor-arg name="cachedKeySourceLimit" value="1" />
+		<constructor-arg name="hostKeyLocation" value="${host.key.location}" />
 	</bean>
 
-	<bean id="keySourceUtil" class="com.lithium.streams.compliance.util.KeySourceUtil" lazy-init="true">
+	<bean id="keySourceUtil" class="com.lithium.streams.compliance.util.KeySourceUtil">
 		<constructor-arg ref="fixedSizeSortedSet" />
-		<constructor-arg name="turonOnEncryption" value="false" />
+		<constructor-arg name="turonOnEncryption" value="true" />
 	</bean>
 </beans>

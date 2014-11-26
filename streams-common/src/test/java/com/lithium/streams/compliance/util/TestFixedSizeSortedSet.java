@@ -40,8 +40,8 @@ public class TestFixedSizeSortedSet {
 	public void setUp() {
 		BasicConfigurator.resetConfiguration();
 		BasicConfigurator.configure();
-		twoSizeSortedSet = new FixedSizeSortedSet<KeySourceHolder>(new KeySourceComparator(), 2);
-		fiveSizeSortedSet = new FixedSizeSortedSet<KeySourceHolder>(new KeySourceComparator(), 5);
+		twoSizeSortedSet = new FixedSizeSortedSet<KeySourceHolder>(new KeySourceComparator(), 2,"/Users/vijay.polsani/temp/host.key");
+		fiveSizeSortedSet = new FixedSizeSortedSet<KeySourceHolder>(new KeySourceComparator(), 5,"/Users/vijay.polsani/temp/host.key");
 		keySourceUtil = EasyMock.createMock(KeySourceUtil.class);
 
 	}

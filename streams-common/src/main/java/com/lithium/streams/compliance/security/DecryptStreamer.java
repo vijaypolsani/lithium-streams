@@ -67,7 +67,7 @@ public class DecryptStreamer {
 		assert name != null;
 		try {
 			for (Key key : keySource.getKeys(replacer.replace(name))) {
-				System.out.println("Name " + name + " Key " + new String(key.getEncoded()));
+				log.info("Name " + name + " Key " + new String(key.getEncoded()));
 				in = decryptIn(in, key);
 			}
 		} catch (UnexpectedHeaderSecurityException use) {

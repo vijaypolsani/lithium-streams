@@ -41,10 +41,9 @@ public class MessageDecryption implements IDecryption {
 			final KeySource source) {
 		DecryptStreamer decryptStreamer = new DecryptStreamer(Configs.empty(), source);
 		final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(secureEvent.getMessage());
-		InputStream inputStream;
 		try {
-			log.info(">>>Performing message decryption. " + new String(secureEvent.getMessage()));
-			inputStream = decryptStreamer.filterIn(byteArrayInputStream, KeyServerProperties.COMMUNITY_NAME.getValue());
+			InputStream inputStream = decryptStreamer.filterIn(byteArrayInputStream, KeyServerProperties.COMMUNITY_NAME
+					.getValue());
 			return new Payload(IOUtils.toByteArray(inputStream));
 		} catch (StreamsCommonSecurityException | IOException e) {
 			log.error(">>>Could not decrypt the message. " + e.getLocalizedMessage());

@@ -31,7 +31,7 @@ public class EncryptionMain {
 
 	private KeyServerDecryption decryptEvent = new KeyServerDecryptionImpl();
 
-	private KeySourceUtil keySourceUtil = new KeySourceUtil(new FixedSizeSortedSet(new KeySourceComparator(), 2), true);
+	private KeySourceUtil keySourceUtil = new KeySourceUtil(new FixedSizeSortedSet(new KeySourceComparator(), 1, "/home/user/host.key"), true);
 
 	public static void main(String args[]) {
 		new EncryptionMain().initialize();

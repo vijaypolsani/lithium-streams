@@ -10,24 +10,29 @@
 
 	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
 
-	<!-- Definition for Compliance App Spring Service beans -->
-	<bean id="keyServerEncryption" class="com.lithium.streams.compliance.security.KeyServerEncryptionImpl" />
-	<bean id="keyServerDecryption" class="com.lithium.streams.compliance.security.KeyServerDecryptionImpl" />
-	<!-- Aspect -->
-	<!-- <bean id="realTimeEncryption" class="com.lithium.streams.compliance.client.RealTimeEncryptionAspect" /> <bean id="realTimeDecryption" 
-		class="com.lithium.streams.compliance.client.RealTimeDecryptionAspect" /> -->
-	<bean id="iEncryption" class="com.lithium.streams.compliance.client.MessageEncryption" />
-	<bean id="iDecryption" class="com.lithium.streams.compliance.client.MessageDecryption" />
-
 	<bean id="keySourceComparator" class="com.lithium.streams.compliance.util.KeySourceComparator" />
 
 	<bean id="fixedSizeSortedSet" class="com.lithium.streams.compliance.util.FixedSizeSortedSet">
 		<constructor-arg ref="keySourceComparator" />
-		<constructor-arg name="cachedKeySourceLimit" value="2" />
+		<constructor-arg name="cachedKeySourceLimit" value="1" />
+		<constructor-arg name="hostKeyLocation" value="./conf/host.key" />
 	</bean>
 
 	<bean id="keySourceUtil" class="com.lithium.streams.compliance.util.KeySourceUtil">
 		<constructor-arg ref="fixedSizeSortedSet" />
 		<constructor-arg name="turonOnEncryption" value="true" />
 	</bean>
+
+	<!-- Aspect -->
+	<!-- <bean id="realTimeEncryption" class="com.lithium.streams.compliance.client.RealTimeEncryptionAspect" /> <bean id="realTimeDecryption" 
+		class="com.lithium.streams.compliance.client.RealTimeDecryptionAspect" /> -->
+	<bean id="iEncryption" class="com.lithium.streams.compliance.client.MessageEncryption" lazy-init="true" />
+	<bean id="iDecryption" class="com.lithium.streams.compliance.client.MessageDecryption" lazy-init="true" />
+
+	<!-- Definition for Compliance App Spring Service beans -->
+	<bean id="keyServerEncryption" class="com.lithium.streams.compliance.security.KeyServerEncryptionImpl"
+		lazy-init="true" />
+	<bean id="keyServerDecryption" class="com.lithium.streams.compliance.security.KeyServerDecryptionImpl"
+		lazy-init="true" />
+
 </beans>
