@@ -22,9 +22,9 @@ public class LiaKafkaConsumerSpout implements IRichSpout {
 	//DEV
 	//private static final String ZOOKEEPER_HOST_URL = "10.240.163.94:2181";
 	//PROD
-	private static final String ZOOKEEPER_HOST_URL = "10.220.186.232:2181";
-	//private static final String ZOOKEEPER_HOST_URL = "10.240.163.94:2181";
-	private static final String ZOOKEEPER_CONNECTION_TIMEOUT = "5000";
+	//TODO: Make this configurable immediately....
+	private static final String ZOOKEEPER_HOST_URL = "10.220.64.155:2181";
+	private static final String ZOOKEEPER_CONNECTION_TIMEOUT = "10000";
 	private static final String OUTPUT_FIELD = "kafkaEvent";
 
 	private KafkaConsumerGroup consumerGroup = null;

@@ -87,7 +87,7 @@ public class ComplianceBatchService {
 	public Response getMessagesFilterdByTime(@HeaderParam("client-id") String clientId,
 			@QueryParam("start") String start, @QueryParam("end") String end) throws InterruptedException,
 			ExecutionException {
-		log.info(">>> Batch Messages from REST Call. " + clientId + " start=" + start + " end=" + end);
+		log.info(">>> Batch Messages from REST Call. clientId: " + clientId + " start=" + start + " end=" + end);
 		try {
 			//IMP: START: REMOVE: Testing. REMOVE After DEMO.
 			// JavaScript tend to send '{}' and has to be verified for NON A NUMBER, to stop causing NumberFormatException.

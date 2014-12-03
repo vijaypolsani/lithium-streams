@@ -17,16 +17,16 @@ public class Worker extends UntypedActor {
 	public void onReceive(Object message) throws Exception {
 		if (message instanceof Work) {
 			Work work = (Work) message;
-			boolean isExisting = MessageFilteringService.filterByTime(work.getUnfilteredMessage().getEventPayload()
-					.getJsonMessage(), work.getStartTime(), work.getEndTime());
-			log.debug(">>> Is Message Valid? " + isExisting);
+			boolean isExisting = MessageFilteringService.filterEventByTime(work.getUnfilteredMessage()
+					.getEventPayload().getJsonMessage(), work.getStartTime(), work.getEndTime());
+			log.info(">>> Is Message Valid? " + isExisting);
 			//log.debug("Worker Name: " + this.hashCode() + " Result:" + result);
 			if (isExisting) {
-				log.debug(">>> Success. Message passes Filter Criteria: "
+				log.info(">>> Success. Message passes Filter Criteria: "
 						+ work.getUnfilteredMessage().getEventPayload().getJsonMessage());
 			} else
-				log.debug("<<< Failed. Message DO NOT PASS Filter Criteria: "
-						+ work.getUnfilteredMessage().getEventPayload().getJsonMessage());
+				log.info("<<< Failed. Message DO NOT PASS Filter Criteria: "
+						+ new String(work.getUnfilteredMessage().getEventPayload().getJsonMessage()));
 			getSender().tell(new WorkResponse(work, isExisting), getSelf());
 
 		} else {

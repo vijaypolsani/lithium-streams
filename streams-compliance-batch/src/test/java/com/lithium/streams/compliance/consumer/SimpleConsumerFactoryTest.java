@@ -20,16 +20,17 @@ public class SimpleConsumerFactoryTest {
 
 	@Before
 	public void setup() throws Exception {
-		GenericObjectPoolConfig config = new GenericObjectPoolConfig();
-		config.setMaxIdle(1);
-		config.setMaxTotal(1);
-		config.setTestOnBorrow(true);
-		config.setTestOnReturn(true);
-		simpleConsumerPool = new SimpleConsumerPool(new SimpleConsumerFactory(EnumKafkaProperties.CLIENT_NAME
-				.getKafkaProperties(), EnumKafkaProperties.BROKER.getKafkaProperties(), Integer
-				.parseInt(EnumKafkaProperties.MESSAGE_SIZE.getKafkaProperties()), Integer
-				.parseInt(EnumKafkaProperties.BUFFER_SIZE.getKafkaProperties()), Integer
-				.parseInt(EnumKafkaProperties.BROKER_PORT.getKafkaProperties())), config);
+		GenericObjectPoolConfig genericObjectPoolConfig = new GenericObjectPoolConfig();
+		genericObjectPoolConfig.setMaxIdle(1);
+		genericObjectPoolConfig.setMaxTotal(1);
+		genericObjectPoolConfig.setTestOnBorrow(true);
+		genericObjectPoolConfig.setTestOnReturn(true);
+
+		simpleConsumerPool = new SimpleConsumerPool(new SimpleConsumerFactory(EnumKafkaProperties.BROKER
+				.getKafkaProperties(), Integer.parseInt(EnumKafkaProperties.BROKER_PORT.getKafkaProperties()), Integer
+				.parseInt(EnumKafkaProperties.SO_TIMEOUT.getKafkaProperties()), Integer
+				.parseInt(EnumKafkaProperties.BUFFER_SIZE.getKafkaProperties()), EnumKafkaProperties.CLIENT_NAME
+				.getKafkaProperties()), genericObjectPoolConfig);
 	}
 
 	@Test

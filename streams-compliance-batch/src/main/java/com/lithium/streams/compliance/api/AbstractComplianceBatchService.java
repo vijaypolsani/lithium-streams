@@ -180,11 +180,12 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 		long readOffset = getEarliestOffsetOfTopic(contex.getTopicName());
 		final List<ComplianceMessage> returnMessages = new ArrayList<>();
 		FetchResponse fetchResponse = getFetchResponse(contex.getTopicName(), readOffset);
+		long numberOfRead = 0;
 		for (MessageAndOffset messageAndOffset : fetchResponse.messageSet(contex.getTopicName(), Integer
 				.parseInt(EnumKafkaProperties.PARTITION.getKafkaProperties()))) {
 			long currentOffset = messageAndOffset.offset();
 			if (currentOffset < readOffset) {
-				log.info("Found an old offset: " + currentOffset + " Expecting: " + readOffset);
+				log.info(">>> Found an old offset: " + currentOffset + " Expecting: " + readOffset);
 				continue;
 			}
 			readOffset = messageAndOffset.nextOffset();
@@ -208,7 +209,7 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 			//End of decryption call.
 
 			log.debug(">>> Offset:Data: " + String.valueOf(messageAndOffset.offset()) + ": "
-					+ compliancePayload.getJsonMessage());
+					+ new String(compliancePayload.getJsonMessage()));
 
 			final ComplianceMessage complianceMessage = ComplianceMessage.MsgBuilder.init(
 					contex.getTopicName() + ":" + messageAndOffset.offset()).header(
@@ -225,14 +226,16 @@ public abstract class AbstractComplianceBatchService implements KafkaLowLevelApi
 			//Decryption method call for enabling wrapping.
 			returnMessages.add(complianceMessage);
 			//End Filtering Service.
+			numberOfRead++;
 		}
+		log.info(">>> Number of messages read from Kafka Topic: " + numberOfRead);
 		return returnMessages;
 	}
 
 	public FetchResponse getFetchResponse(final String topicName, long readOffset) throws Exception {
 		FetchRequest req = new FetchRequestBuilder().clientId(EnumKafkaProperties.CLIENT_NAME.getKafkaProperties())
 				.addFetch(topicName, Integer.parseInt(EnumKafkaProperties.PARTITION.getKafkaProperties()), readOffset,
-						1024000) // Note: this fetchSize of 100000 might need to be increased if large batches are written to Kafka
+						Integer.parseInt(EnumKafkaProperties.MESSAGE_SIZE.getKafkaProperties())) // Note: this fetchSize of 100000 might need to be increased if large batches are written to Kafka
 				.build();
 		SimpleConsumer consumer = simpleConsumerPool.borrowObject();
 		FetchResponse fetchResponse = consumer.fetch(req);

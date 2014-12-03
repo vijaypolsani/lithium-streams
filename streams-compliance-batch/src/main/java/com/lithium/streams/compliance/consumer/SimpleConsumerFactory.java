@@ -11,20 +11,20 @@ public class SimpleConsumerFactory extends BasePooledObjectFactory<SimpleConsume
 	private final String clientName;
 	private final String brokerName;
 	private final int port;
-	private final int messageSize;
+	private final int soTimeout;
 	private final int bufferSize;
 
-	public SimpleConsumerFactory(String clientName, String brokerName, int port, int messageSize, int bufferSize) {
-		this.clientName = clientName;
+	public SimpleConsumerFactory(String brokerName, int port, int soTimeout, int bufferSize, String clientName) {
 		this.brokerName = brokerName;
 		this.port = port;
-		this.messageSize = messageSize;
+		this.soTimeout = soTimeout;
 		this.bufferSize = bufferSize;
+		this.clientName = clientName;
 	}
 
 	@Override
 	public SimpleConsumer create() throws Exception {
-		return new SimpleConsumer(brokerName, port, messageSize, bufferSize, clientName);
+		return new SimpleConsumer(brokerName, port, soTimeout, bufferSize, clientName);
 	}
 
 	@Override

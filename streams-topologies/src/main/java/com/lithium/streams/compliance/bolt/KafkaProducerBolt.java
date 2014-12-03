@@ -22,9 +22,9 @@ public class KafkaProducerBolt extends BaseRichBolt {
 	private static final String INTPUT_FIELD_DATA = "kafkaCommunityEvent";
 	private static final String INTPUT_FIELD_DEST = "topicName";
 	//PROD
-	private static final String KAFKA_AWS_BROKER_URL = "10.220.186.232:9092";
+	//TODO: Make this configurable ASAP....
+	private static final String KAFKA_AWS_BROKER_URL = "10.220.64.155:9092";
 	//DEV
-	//private static final String KAFKA_AWS_BROKER_URL = "10.240.163.94:9092";
 	//private static final String KAFKA_AWS_BROKER_URL = "10.240.163.94:9092";
 	//private static final String KAFKA_LOCALHOST_BROKER_URL = "localhost:9092";
 

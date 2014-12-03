@@ -1,5 +1,7 @@
 package com.lithium.streams.compliance.filter;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -30,7 +32,8 @@ public class FilterSystemTest {
 	@Test
 	public void testTheFilterCapabilitiesFor10000() {
 		//1 year
-		long startTime = System.currentTimeMillis() - 9999999999l;
+		long startTime = System.currentTimeMillis() - 99999999999l;
+
 		long endTime = System.currentTimeMillis();
 		log.info("Start Time : " + startTime);
 		log.info("End Time : " + endTime);
@@ -38,7 +41,7 @@ public class FilterSystemTest {
 		Collection<ComplianceMessage> messages = new ArrayList<>();
 		for (int i = 0; i < 10000; i++) {
 			ComplianceMessage msg = ComplianceMessage.MsgBuilder.init("junit" + i).payload(
-					CompliancePayload.init(MessageFilteringService.SAMPLE_INPUT.getBytes())).build();
+					CompliancePayload.init(MessageFilteringService.SAMPLE_INPUT1.getBytes())).build();
 			messages.add(msg);
 		}
 		Timeout timeout = new Timeout(Duration.create(5, "seconds"));
@@ -46,13 +49,15 @@ public class FilterSystemTest {
 		FilteringSystem filteringSystem = new FilteringSystem();
 		Future<Object> future = Patterns.ask(filteringSystem.getMaster(), new Request(messages, startTime, endTime),
 				timeout);
+		Result result = null;
 		try {
-			String result = (String) Await.result(future, timeout.duration());
+			result = (Result) Await.result(future, timeout.duration());
 			log.info("Result: " + result);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		assertNotNull(result);
 
 	}
 }

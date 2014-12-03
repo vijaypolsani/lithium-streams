@@ -54,7 +54,7 @@ public class MinimalServer {
 	public static void main(String args[]) throws Exception {
 
 		//Set the package where the services reside
-		rsServletHolder.setInitParameter("jersey.config.server.provider.packages", "org.streams.compliance.service");
+		rsServletHolder.setInitParameter("jersey.config.server.provider.packages", "com.lithium.streams.compliance.service.ws");
 		resourceConfig.packages(ComplianceService.class.getPackage().getName());
 
 		resourceConfig.register(com.lithium.streams.compliance.beans.StreamEventBus.class);
@@ -90,7 +90,7 @@ public class MinimalServer {
 		context.addServlet(new ServletHolder(new AdminServlet()), "/admin/*");
 		context.addServlet(new ServletHolder(new DumpServlet()), "/dump/*");
 
-		PropertyConfigurator.configure("./log4j.properties");
+		PropertyConfigurator.configure("./conf/log4j.properties");
 
 		Server server = new Server(threadPool);
 		server.addBean(new MBeanContainer(ManagementFactory.getPlatformMBeanServer()));
@@ -124,7 +124,7 @@ public class MinimalServer {
 	private static ServerConnector setHttpsConfiguration(Server server, HttpConfiguration http_config) {
 		SslContextFactory sslContextFactory = new SslContextFactory();
 		System.out.println("user.home " + System.getProperty("user.home"));
-		sslContextFactory.setKeyStorePath("./keystore.jks");
+		sslContextFactory.setKeyStorePath("./conf/keystore.jks");
 		sslContextFactory.setKeyStorePassword("changeme");
 		sslContextFactory.setKeyManagerPassword("changeme");
 

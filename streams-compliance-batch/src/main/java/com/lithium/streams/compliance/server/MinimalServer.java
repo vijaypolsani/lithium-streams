@@ -66,9 +66,9 @@ public class MinimalServer {
 
 		connectors[0] = serverConnector;
 
-		PropertyConfigurator.configure("./log4j.properties");
+		PropertyConfigurator.configure("./conf/log4j.properties");
 
-		sslContextFactory.setKeyStorePath("./keystore.jks");
+		sslContextFactory.setKeyStorePath("./conf/keystore.jks");
 		sslContextFactory.setKeyStorePassword("changeme");
 		sslContextFactory.setKeyManagerPassword("changeme");
 		https_config.addCustomizer(new SecureRequestCustomizer());
@@ -96,7 +96,7 @@ public class MinimalServer {
 		//resourceHandler.setResourceBase("/Users/vijay.polsani/_eclipseworkspace/lithium-streams/streams-compliance-batch/web/index.html");
 		//Prod 
 		resourceHandler.setDirectoriesListed(true);
-		resourceHandler.setWelcomeFiles(new String[] { "index.html" });
+		resourceHandler.setWelcomeFiles(new String[] { "./conf/index.html" });
 		resourceHandler.setResourceBase("./web");
 
 		handlers.setHandlers(new Handler[] { resourceHandler, logHandler, stats,

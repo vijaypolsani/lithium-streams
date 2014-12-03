@@ -10,28 +10,13 @@ import lithium.research.key.KeySource;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.lithium.streams.compliance.model.Payload;
 import com.lithium.streams.compliance.model.SecureEvent;
 import com.lithium.streams.compliance.security.EncryptStreamer;
-import com.lithium.streams.compliance.security.KeyServerEncryption;
 import com.lithium.streams.compliance.security.KeyServerProperties;
-import com.lithium.streams.compliance.util.KeySourceUtil;
 
 public class MessageEncryption implements IEncryption {
-	@Autowired
-	private KeyServerEncryption keyServerEncryption;
-	@Autowired
-	private KeySourceUtil keySourceUtil;
-
-	public KeySourceUtil getKeySourceUtil() {
-		return keySourceUtil;
-	}
-
-	public void setKeySourceUtil(KeySourceUtil keySourceUtil) {
-		this.keySourceUtil = keySourceUtil;
-	}
 
 	private static final Logger log = LoggerFactory.getLogger(MessageEncryption.class);
 
