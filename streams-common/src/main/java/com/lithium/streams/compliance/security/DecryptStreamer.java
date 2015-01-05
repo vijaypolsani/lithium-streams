@@ -5,7 +5,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -34,7 +33,7 @@ import com.lithium.streams.compliance.exception.StreamsCommonSecurityException;
 import com.lithium.streams.compliance.exception.UnexpectedHeaderSecurityException;
 
 /**
- * Decrypt Utility
+ * Decrypt Streamer
  *
  */
 public class DecryptStreamer {
@@ -62,9 +61,8 @@ public class DecryptStreamer {
 	}
 
 	@Nonnull
-	public InputStream filterIn(@Nonnull InputStream in, @Nullable String name) throws StreamsCommonSecurityException {
-		checkArgument(name != null, "name must be specified for key lookup");
-		assert name != null;
+	public InputStream filterIn(@Nonnull InputStream in, @Nonnull String name) throws StreamsCommonSecurityException {
+		checkNotNull(name, "Name must be specified for key lookup");
 		try {
 			for (Key key : keySource.getKeys(replacer.replace(name))) {
 				log.info("Name " + name + " Key " + new String(key.getEncoded()));

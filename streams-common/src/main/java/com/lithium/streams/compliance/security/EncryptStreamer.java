@@ -53,6 +53,7 @@ public class EncryptStreamer {
 
 	@Nonnull
 	public OutputStream filterOut(@Nonnull OutputStream out, String name) throws IOException {
+		checkNotNull(name, "Name must be specified for key lookup");
 		List<Key> keys = null;
 		try {
 			keys = keySource.getKeys(replacer.replace(name));

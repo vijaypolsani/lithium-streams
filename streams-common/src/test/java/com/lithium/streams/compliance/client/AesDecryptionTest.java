@@ -34,7 +34,7 @@ public class AesDecryptionTest {
 	//private static final String TEST_DATA_LOCATION = "./data/lia147.release.qa.log.xz.aes.aes";
 	private static final String TEST_DATA_LOCATION = "/home/user/Downloads/data/lia147.release.qa.log.xz.aes.aes";
 
-	private static final Logger log = LoggerFactory.getLogger(TestIDecryption.class);
+	private static final Logger log = LoggerFactory.getLogger(IDecryptionTest.class);
 
 	private KeyServerEncryption encryptEvent = new KeyServerEncryptionImpl();
 

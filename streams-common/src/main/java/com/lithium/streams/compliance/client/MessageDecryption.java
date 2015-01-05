@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.annotation.Nonnull;
+
 import lithium.research.config.Configs;
 import lithium.research.key.KeySource;
 
@@ -16,14 +18,21 @@ import com.lithium.streams.compliance.model.Payload;
 import com.lithium.streams.compliance.model.SecureEvent;
 import com.lithium.streams.compliance.security.DecryptStreamer;
 import com.lithium.streams.compliance.security.KeyServerProperties;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkArgument;
 
 public class MessageDecryption implements IDecryption {
 
-
 	private static final Logger log = LoggerFactory.getLogger(MessageDecryption.class);
 
-	public SecureEvent performMessageDecryption(final SecureEvent secureEvent, final String communityName,
-			final KeySource source) {
+	public SecureEvent performMessageDecryption(@Nonnull final SecureEvent secureEvent,
+			@Nonnull final String communityName, @Nonnull final KeySource source) {
+		checkNotNull(secureEvent, "Message that needs ecryption must be present.");
+		checkArgument(secureEvent.getMessage() == null, "Message content inside the event is empty.");
+		checkNotNull(communityName, "Community Name for getting decryption key is needed.");
+		checkArgument(communityName.length() == 0, "communityName name is empty: %s", communityName);
+		checkNotNull(source, "Keysource utility object ceration is not complete.");
+
 		DecryptStreamer decryptStreamer = new DecryptStreamer(Configs.empty(), source);
 		final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(secureEvent.getMessage());
 		try {

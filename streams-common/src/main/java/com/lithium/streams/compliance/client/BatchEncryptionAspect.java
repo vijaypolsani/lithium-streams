@@ -1,5 +1,7 @@
 package com.lithium.streams.compliance.client;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -13,6 +15,8 @@ public class BatchEncryptionAspect implements IEncryptionAspect {
 	@Around("execution (* com.lithium.streams.compliance.security.KeyServerEncryptionImpl.performMessageEncryption(..))")
 	@Override
 	public Object encryptBeforeSending(ProceedingJoinPoint proceedingJoinPoint) {
+		checkNotNull(proceedingJoinPoint, "Joinpoint is null.");
+
 		log.info(">>>EncryptBeforeSending() Aspect is running! method Name: "
 				+ proceedingJoinPoint.getSignature().getName());
 		Object[] args = proceedingJoinPoint.getArgs();

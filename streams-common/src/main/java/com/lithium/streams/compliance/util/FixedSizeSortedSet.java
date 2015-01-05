@@ -19,6 +19,7 @@ import lithium.research.keys.ClientKeySource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Throwables;
 import com.lithium.streams.compliance.exception.HostKeyNotFoundSecurityException;
 import com.lithium.streams.compliance.security.KeyServerProperties;
 
@@ -47,11 +48,13 @@ public class FixedSizeSortedSet<KeySourceHolder> extends TreeSet<KeySourceHolder
 					hostKeyLocation));
 		} catch (FileNotFoundException fe) {
 			fe.printStackTrace();
+			Optional.empty();
 			throw new HostKeyNotFoundSecurityException("HostKey not found. Please check file location."
 					+ fe.getLocalizedMessage());
 		} catch (IOException e) {
 			e.printStackTrace();
-			return source.empty();
+			Optional.empty();
+			Throwables.propagate(e);
 		}
 		return source;
 	}

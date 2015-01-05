@@ -3,7 +3,6 @@ package com.lithium.streams.compliance.util;
 import static com.google.common.io.BaseEncoding.base16;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -18,9 +17,7 @@ import lithium.research.keys.ClientKeySource;
 import org.apache.log4j.BasicConfigurator;
 import org.easymock.EasyMock;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +37,10 @@ public class TestFixedSizeSortedSet {
 	public void setUp() {
 		BasicConfigurator.resetConfiguration();
 		BasicConfigurator.configure();
-		twoSizeSortedSet = new FixedSizeSortedSet<KeySourceHolder>(new KeySourceComparator(), 2,"/Users/vijay.polsani/temp/host.key");
-		fiveSizeSortedSet = new FixedSizeSortedSet<KeySourceHolder>(new KeySourceComparator(), 5,"/Users/vijay.polsani/temp/host.key");
+		twoSizeSortedSet = new FixedSizeSortedSet<KeySourceHolder>(new KeySourceComparator(), 2,
+				"/Users/vijay.polsani/temp/host.key");
+		fiveSizeSortedSet = new FixedSizeSortedSet<KeySourceHolder>(new KeySourceComparator(), 5,
+				"/Users/vijay.polsani/temp/host.key");
 		keySourceUtil = EasyMock.createMock(KeySourceUtil.class);
 
 	}
@@ -58,11 +57,12 @@ public class TestFixedSizeSortedSet {
 		try {
 			log.info("Current Directory: "
 					+ getClass().getProtectionDomain().getCodeSource().getLocation().toExternalForm());
+			log.info("Host Key Directory: " + System.getProperty("user.home")
+					+ MockKeyServerProperties.HOST_KEY_PATH.getValue());
 			source = Optional.of(new ClientKeySource(URI.create(MockKeyServerProperties.URI_LINK.getValue()),
 					MockKeyServerProperties.EMAIL.getValue(), new SecretKeySpec(base16().decode(
 							MockKeyServerProperties.USER_KEY.getValue()), MockKeyServerProperties.AES.getValue()),
-					getClass().getProtectionDomain().getCodeSource().getLocation().getPath()
-							+ MockKeyServerProperties.HOST_KEY_PATH.getValue()));
+					System.getProperty("user.home") + MockKeyServerProperties.HOST_KEY_PATH.getValue()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

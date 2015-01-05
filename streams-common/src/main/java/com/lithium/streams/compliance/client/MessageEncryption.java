@@ -1,8 +1,13 @@
 package com.lithium.streams.compliance.client;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
+import javax.annotation.Nonnull;
 
 import lithium.research.config.Configs;
 import lithium.research.key.KeySource;
@@ -21,8 +26,13 @@ public class MessageEncryption implements IEncryption {
 	private static final Logger log = LoggerFactory.getLogger(MessageEncryption.class);
 
 	@Override
-	public SecureEvent performMessageEncryption(final SecureEvent secureEvent, final String communityName,
-			final KeySource source) {
+	public SecureEvent performMessageEncryption(@Nonnull final SecureEvent secureEvent,
+			@Nonnull final String communityName, @Nonnull final KeySource source) {
+		checkNotNull(secureEvent, "Message that needs ecryption must be present.");
+		checkArgument(secureEvent.getMessage() == null, "Message content inside the event is empty.");
+		checkNotNull(communityName, "Community Name for getting decryption key is needed.");
+		checkArgument(communityName.length() == 0, "communityName name is empty: %s", communityName);
+		checkNotNull(source, "Keysource utility object ceration is not complete.");
 		try {
 			final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 			EncryptStreamer encryptStreamer = new EncryptStreamer(Configs.empty(), source);

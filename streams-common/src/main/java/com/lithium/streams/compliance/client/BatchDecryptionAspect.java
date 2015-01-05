@@ -6,6 +6,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.lithium.streams.compliance.security.KeyServerEncryption;
 
@@ -22,6 +23,8 @@ public class BatchDecryptionAspect implements IDecryptionAspect {
 	@Override
 	@Around("execution (* com.lithium.streams.compliance.security.KeyServerDecryptionImpl.performMessageDecryption(..))")
 	public Object decryptBeforeSending(ProceedingJoinPoint proceedingJoinPoint) {
+		checkNotNull(proceedingJoinPoint, "Joinpoint is null.");
+
 		log.info(">>>DecryptBeforeSending() Aspect is running! method Name: "
 				+ proceedingJoinPoint.getSignature().getName());
 		Object[] args = proceedingJoinPoint.getArgs();

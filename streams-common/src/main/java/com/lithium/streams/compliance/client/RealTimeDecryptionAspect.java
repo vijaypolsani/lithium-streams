@@ -1,5 +1,7 @@
 package com.lithium.streams.compliance.client;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -19,6 +21,8 @@ public class RealTimeDecryptionAspect implements IDecryptionAspect {
 	@Override
 	@Around("execution (* com.lithium.streams.compliance.consumer.ConsumerCallable.performMessageDecryption(..))")
 	public Object decryptBeforeSending(ProceedingJoinPoint proceedingJoinPoint) {
+		checkNotNull(proceedingJoinPoint, "Join point is null.");
+
 		log.info(">>>DecryptBeforeSending() Aspect is running! method Name: "
 				+ proceedingJoinPoint.getSignature().getName());
 		Object[] args = proceedingJoinPoint.getArgs();
